@@ -61,7 +61,7 @@ bool HelloWorld::init()
 	Sprite* pBgSprite = Sprite::create("background.png");
 	pBgSprite->setAnchorPoint(Point(0, 1));
 	pBgSprite->setPosition(Point(0.f, pBgSprite->getContentSize().height));
-	this->addChild(pBgSprite, 0);
+	this->addChild(pBgSprite, 0, 1);
     
 	//hero
 	_pHero = new SynthHero();
