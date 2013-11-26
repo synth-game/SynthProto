@@ -17,8 +17,16 @@ public:
 	void printData();
 
 private:
+	enum EDirection
+	{
+		eTop,
+		eLeft,
+		eRight
+	};
+
 	void	fallTest(SynthHero* pHero, cocos2d::Point& nextPosition);
 	void	groundLateralTest(SynthHero* pHero, cocos2d:: Point& nextPosition);
+	void	boundingTest(SynthHero* pHero, cocos2d::Point& nextPosition,  EDirection dir);
 	
 	unsigned char getAlpha(int x, int y);
 

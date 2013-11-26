@@ -11,6 +11,20 @@ void SynthLevelBitmask::bitmaskCollisionTest(SynthHero* pHero, Point& nextPositi
 		groundLateralTest(pHero, nextPosition);
 	}
 
+	if(pHero->getSpeed().y > 0)
+	{
+		boundingTest(pHero, nextPosition, eTop);
+	}
+
+	if(pHero->getSpeed().x < 0)
+	{
+		boundingTest(pHero, nextPosition, eLeft);
+	}
+	else if(pHero->getSpeed().x > 0)
+	{
+		boundingTest(pHero, nextPosition, eRight);
+	}
+
 	fallTest(pHero, nextPosition);
 }
 
@@ -114,6 +128,40 @@ void SynthLevelBitmask::groundLateralTest(SynthHero* pHero, Point& nextPosition)
 		else
 		{
 			//do nothing
+		}
+	}
+}
+
+void SynthLevelBitmask::boundingTest(SynthHero* pHero, Point& nextPosition,  EDirection dir)
+{
+	int half_sprite_w = static_cast<int>(floor((pHero->getWidth()/2.f) - 0.5f));
+	int half_sprite_h = static_cast<int>(floor((pHero->getHeight()/2.f) - 0.5f));
+
+	int next_pos_x = static_cast<int>(pHero->getPosition().x - _absolutePosition.x);
+	int	next_pos_y = static_cast<int>(_absolutePosition.y - pHero->getPosition().y);
+	if(dir == eTop)
+	{
+		next_pos_y -= half_sprite_h;
+	}
+	else if(dir == eLeft)
+	{
+		next_pos_x -= half_sprite_w;
+	}
+	else if(dir == eRight)
+	{
+		next_pos_x += half_sprite_w;
+	}
+
+	if(getAlpha(next_pos_x, next_pos_y) == 255)
+	{
+		if(dir == eTop)
+		{
+			pHero->fall();
+			nextPosition.y = pHero->getPosition().y;
+		}
+		else
+		{
+			pHero->stop();
 		}
 	}
 }

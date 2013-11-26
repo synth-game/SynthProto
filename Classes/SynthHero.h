@@ -28,6 +28,7 @@ public:
 	float  getHeight() { return _pHeroSprite->getTextureRect().size.height; }
 
 	cocos2d::Point getPosition() { return _pHeroSprite->getPosition(); }
+	cocos2d::Point getSpeed() { return _currentSpeed; }
 
 	void setLevelBitmask(SynthLevelBitmask* pLevelBitmask) { _pLevelBitmask = pLevelBitmask; }
 
