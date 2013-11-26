@@ -46,6 +46,7 @@ private:
 	
 	cocos2d::Sprite* _pHeroSprite;
 	SynthLevelBitmask* _pLevelBitmask;
+	cocos2d::Layer* _pParent;
 };
 
 #endif //__SYNTH_HERO_H__

@@ -33,6 +33,7 @@ void SynthHero::init(Layer* pParent)
 	_pHeroSprite = Sprite::create("sprites/sprite_hero.png");
 	_pHeroSprite->setPosition(Point(200.f, 150.f)); 
 	pParent->addChild(_pHeroSprite, 1);
+	_pParent = pParent;
 }
 
 void SynthHero::walkLeft(bool bStart)
@@ -111,14 +112,18 @@ void SynthHero::move(float fDt)
 		fall();
 	}
 
-	Point nextPosition = _pHeroSprite->getPosition() + (_currentSpeed * fDt);
+	Point nextHeroPosition = _pHeroSprite->getPosition() + (_currentSpeed * fDt);
 	//collision Test
 	/*if(nextPosition.y < 200)
 	{
 		nextPosition.y = 200;
 		land();
 	}*/
-	_pLevelBitmask->bitmaskCollisionTest(this, nextPosition);
+	_pLevelBitmask->bitmaskCollisionTest(this, nextHeroPosition);
 
-	_pHeroSprite->setPosition(nextPosition);
+	_pHeroSprite->setPosition(nextHeroPosition);
+
+	// Updating layer position
+	Point nextLayerPosition = Point(-1*(nextHeroPosition.x-450.f),-1*(nextHeroPosition.y-320.f));
+	_pParent->setPosition(nextLayerPosition);
 }
