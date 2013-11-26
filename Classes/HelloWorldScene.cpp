@@ -57,7 +57,13 @@ bool HelloWorld::init()
     /////////////////////////////
     // 3. add your codes below...
 
-   //background sprite
+	// decor sprite
+	Sprite* pDecorSprite = Sprite::create("decor.jpg");
+	pDecorSprite->setAnchorPoint(Point(0,1));
+	pDecorSprite->setPosition(Point(0.f, pDecorSprite->getContentSize().height));
+	this->addChild(pDecorSprite, 0, 2);
+
+    //background sprite
 	Sprite* pBgSprite = Sprite::create("background.png");
 	pBgSprite->setAnchorPoint(Point(0, 1));
 	pBgSprite->setPosition(Point(0.f, pBgSprite->getContentSize().height));
