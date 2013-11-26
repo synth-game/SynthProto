@@ -8,7 +8,9 @@ To start working on this prototype, follow this different steps :
   - Go to the new projects/SynthProto/ folder (from the root repertory)
   - It's time to get the remote code and to plug with Github :
     - Delete the Classes and Resources folder in your project repertory
-    - Clone this remote repository wherever you want
-    - Copy its content (.git folder include) inside the SynthProto folder
+    - then do:
+      - git init
+      - git remote set-url origin https://github.com/synth-game/SynthProto.git
+      - git pull origin master
 
 You can now start working !
