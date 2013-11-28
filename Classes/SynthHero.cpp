@@ -30,11 +30,29 @@ SynthHero::~SynthHero()
 
 void SynthHero::init(Layer* pParent)
 {
-	_pHeroSprite = Sprite::create("sprites/sprite_hero.png");
-	_pHeroSprite->setPosition(Point(200.f, 150.f)); 
-	pParent->addChild(_pHeroSprite, 1);
+
+	// Sprite sheet
+	SpriteBatchNode* spritebatch = SpriteBatchNode::create("sprites/megaman.pvr");
+	SpriteFrameCache* cache = SpriteFrameCache::sharedSpriteFrameCache();
+	cache->addSpriteFramesWithFile("sprites/megaman.plist");
+
+	_pHeroSprite = Sprite::createWithSpriteFrameName("walk_1.png");
+	spritebatch->addChild(_pHeroSprite);
+	spritebatch->setPosition(Point(200.f, 180.f)); 
 	_pParent = pParent;
-	CCLOG("Background size : %fx%f",_pParent->getChildByTag(1)->getContentSize().width,_pParent->getChildByTag(1)->getContentSize().height);
+	_pParent->addChild(spritebatch, 1);
+
+	// Sprite animation
+	Array* animFrames = Array::createWithCapacity(5);
+	char str[100] = {0};
+	for(int i = 1; i <= 5; i++) 
+	{
+	    sprintf(str, "walk_%d.png", i);
+	    SpriteFrame* frame = cache->spriteFrameByName( str );
+	    animFrames->addObject(frame);
+	}
+	Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.1f);
+	_pHeroSprite->runAction( RepeatForever::create( Animate::create(animation) ) );
 
 }
 
@@ -115,25 +133,24 @@ void SynthHero::move(float fDt)
 	}
 
 	Point nextHeroPosition = _pHeroSprite->getPosition() + (_currentSpeed * fDt);
-	//collision Test
-	/*if(nextPosition.y < 200)
-	{
-		nextPosition.y = 200;
-		land();
-	}*/
-	_pLevelBitmask->bitmaskCollisionTest(this, nextHeroPosition);
+	CCLOG("hero position : (%f, %f)", _pHeroSprite->getPosition().x, _pHeroSprite->getPosition().y);
+	//_pLevelBitmask->bitmaskCollisionTest(this, nextHeroPosition);
 
+	/* Hero sprite */
 	_pHeroSprite->setPosition(nextHeroPosition);
+	
 
 	/* Updating layer position */
 	Point nextLayerPosition = Point(-1*(nextHeroPosition.x-450),-1*(nextHeroPosition.y-320));
 	Size backgroundSize = _pParent->getChildByTag(1)->getContentSize();
 
 	// Block to the edge of the layer
-	if(nextHeroPosition.x < 450 || nextHeroPosition.x > backgroundSize.width-450) nextLayerPosition.x = _pParent->getPosition().x;
-	if(nextHeroPosition.y < 320 || nextHeroPosition.y > backgroundSize.height-320) nextLayerPosition.y = _pParent->getPosition().y;
+	if(nextHeroPosition.x < 450 || nextHeroPosition.x > backgroundSize.width-450) 
+		nextLayerPosition.x = _pParent->getPosition().x;
+	if(nextHeroPosition.y < 320 || nextHeroPosition.y > backgroundSize.height-320) 
+		nextLayerPosition.y = _pParent->getPosition().y;
 
-	CCLOG("Next layer position : (%f, %f)", nextLayerPosition.x, nextLayerPosition.y);
+	//CCLOG("Next layer position : (%f, %f)", nextLayerPosition.x, nextLayerPosition.y);
 
 	_pParent->setPosition(nextLayerPosition);
 
