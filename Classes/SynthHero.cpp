@@ -35,8 +35,9 @@ void SynthHero::init(Layer* pParent)
 	SpriteBatchNode* spritebatch = SpriteBatchNode::create("sprites/megaman.pvr");
 	SpriteFrameCache* cache = SpriteFrameCache::sharedSpriteFrameCache();
 	cache->addSpriteFramesWithFile("sprites/megaman.plist");
+	cache->retain();
 
-	_pHeroSprite = Sprite::createWithSpriteFrameName("walk_1.png");
+	_pHeroSprite = Sprite::createWithSpriteFrameName("walk_3.png");
 	spritebatch->addChild(_pHeroSprite);
 	spritebatch->setPosition(Point(200.f, 180.f)); 
 	_pParent = pParent;
@@ -51,9 +52,8 @@ void SynthHero::init(Layer* pParent)
 	    SpriteFrame* frame = cache->spriteFrameByName( str );
 	    animFrames->addObject(frame);
 	}
-	Animation* animation = Animation::createWithSpriteFrames(animFrames, 0.1f);
-	_pHeroSprite->runAction( RepeatForever::create( Animate::create(animation) ) );
-
+	_walkAnimation = Animation::createWithSpriteFrames(animFrames, 0.1f);
+	//_pHeroSprite->runAction( RepeatForever::create( Animate::create(_walkAnimation) ) );
 }
 
 void SynthHero::walkLeft(bool bStart)
@@ -138,7 +138,7 @@ void SynthHero::move(float fDt)
 
 	/* Hero sprite */
 	_pHeroSprite->setPosition(nextHeroPosition);
-	
+	_pHeroSprite->runAction( RepeatForever::create( Animate::create(_walkAnimation) ) );
 
 	/* Updating layer position */
 	Point nextLayerPosition = Point(-1*(nextHeroPosition.x-450),-1*(nextHeroPosition.y-320));
