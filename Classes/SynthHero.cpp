@@ -44,16 +44,17 @@ void SynthHero::init(Layer* pParent)
 	_pParent->addChild(spritebatch, 1);
 
 	// Sprite animation
-	Array* animFrames = Array::createWithCapacity(5);
+	Array* animFrames = Array::create();
 	char str[100] = {0};
 	for(int i = 1; i <= 5; i++) 
 	{
 	    sprintf(str, "walk_%d.png", i);
 	    SpriteFrame* frame = cache->spriteFrameByName( str );
+        frame->retain();
 	    animFrames->addObject(frame);
 	}
-	_walkAnimation = Animation::createWithSpriteFrames(animFrames, 0.1f);
-	//_pHeroSprite->runAction( RepeatForever::create( Animate::create(_walkAnimation) ) );
+	_walkAnimation = Animate::create(Animation::createWithSpriteFrames(animFrames, 0.1f));
+    _walkAnimation->retain();
 }
 
 void SynthHero::walkLeft(bool bStart)
@@ -72,8 +73,10 @@ void SynthHero::walkLeft(bool bStart)
 
 void SynthHero::walkRight(bool bStart)
 {
+    _pHeroSprite->stopAllActions();
 	if(bStart)
 	{
+        _pHeroSprite->runAction( RepeatForever::create( _walkAnimation ) );
 		_bIsRightMoving = true;
 		_targetSpeed.x = MAX_HORIZ_SPEED;
 	}
@@ -138,8 +141,7 @@ void SynthHero::move(float fDt)
 
 	/* Hero sprite */
 	_pHeroSprite->setPosition(nextHeroPosition);
-	_pHeroSprite->runAction( RepeatForever::create( Animate::create(_walkAnimation) ) );
-
+    
 	/* Updating layer position */
 	Point nextLayerPosition = Point(-1*(nextHeroPosition.x-450),-1*(nextHeroPosition.y-320));
 	Size backgroundSize = _pParent->getChildByTag(1)->getContentSize();

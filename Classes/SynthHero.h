@@ -45,9 +45,8 @@ private:
 	bool			_bIsFalling;
 	
 	cocos2d::Sprite* _pHeroSprite;
-	cocos2d::Animation* _walkAnimation;
+	cocos2d::Animate* _walkAnimation;
 	cocos2d::Animation* _jumpAnimation;
-
 	SynthLevelBitmask* _pLevelBitmask;
 	cocos2d::Layer* _pParent;
 	
