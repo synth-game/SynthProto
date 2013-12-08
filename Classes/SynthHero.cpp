@@ -31,7 +31,7 @@ SynthHero::~SynthHero()
 void SynthHero::init(Layer* pParent)
 {
 	_pHeroSprite = Sprite::create("sprites/sprite_hero.png");
-	_pHeroSprite->setPosition(Point(200.f, 150.f)); 
+	_pHeroSprite->setPosition(Point(200.f, 180.f)); 
 	pParent->addChild(_pHeroSprite, 1);
 	_pParent = pParent;
 	CCLOG("Background size : %fx%f",_pParent->getChildByTag(1)->getContentSize().width,_pParent->getChildByTag(1)->getContentSize().height);
@@ -133,7 +133,7 @@ void SynthHero::move(float fDt)
 	if(nextHeroPosition.x < 450 || nextHeroPosition.x > backgroundSize.width-450) nextLayerPosition.x = _pParent->getPosition().x;
 	if(nextHeroPosition.y < 320 || nextHeroPosition.y > backgroundSize.height-320) nextLayerPosition.y = _pParent->getPosition().y;
 
-	CCLOG("Next layer position : (%f, %f)", nextLayerPosition.x, nextLayerPosition.y);
+	//CCLOG("Next layer position : (%f, %f)", nextLayerPosition.x, nextLayerPosition.y);
 
 	_pParent->setPosition(nextLayerPosition);
 

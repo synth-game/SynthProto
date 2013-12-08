@@ -2,8 +2,6 @@
 
 #include "SynthLevelBitmask.h"
 
-#define LEVEL_WIDTH 1200
-
 USING_NS_CC;
 
 HelloWorld::HelloWorld()
@@ -76,6 +74,8 @@ bool HelloWorld::init()
 	pBgProgram->addAttribute(GLProgram::ATTRIBUTE_NAME_TEX_COORD, GLProgram::VERTEX_ATTRIB_TEX_COORDS);
 	pBgProgram->link();
 	pBgProgram->updateUniforms();
+	pBgProgram->use();
+	pBgProgram->setUniformLocationWith2f(pBgProgram->getUniformLocationForName("uTexSize"), pBgSprite->getContentSize().width, pBgSprite->getContentSize().height);
 	pBgSprite->setShaderProgram(pBgProgram);
     
 	//hero
