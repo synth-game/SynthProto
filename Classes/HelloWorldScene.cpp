@@ -2,8 +2,6 @@
 
 #include "SynthLevelBitmask.h"
 
-#define LEVEL_WIDTH 1200
-
 USING_NS_CC;
 
 HelloWorld::HelloWorld()
@@ -68,6 +66,17 @@ bool HelloWorld::init()
 	pBgSprite->setAnchorPoint(Point(0, 1));
 	pBgSprite->setPosition(Point(0.f, pBgSprite->getContentSize().height));
 	this->addChild(pBgSprite, 0, 1);
+
+	//set background sprite shaders
+	GLProgram* pBgProgram = new GLProgram();
+	pBgProgram->initWithVertexShaderFilename("shaders/synthTestShader.vs", "shaders/synthTestShader.fs");
+	pBgProgram->addAttribute(GLProgram::ATTRIBUTE_NAME_POSITION, GLProgram::VERTEX_ATTRIB_POSITION);
+	pBgProgram->addAttribute(GLProgram::ATTRIBUTE_NAME_TEX_COORD, GLProgram::VERTEX_ATTRIB_TEX_COORDS);
+	pBgProgram->link();
+	pBgProgram->updateUniforms();
+	pBgProgram->use();
+	pBgProgram->setUniformLocationWith2f(pBgProgram->getUniformLocationForName("uTexSize"), pBgSprite->getContentSize().width, pBgSprite->getContentSize().height);
+	pBgSprite->setShaderProgram(pBgProgram);
     
 	//hero
 	_pHero = new SynthHero();

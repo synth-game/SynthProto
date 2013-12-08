@@ -30,7 +30,6 @@ SynthHero::~SynthHero()
 
 void SynthHero::init(Layer* pParent)
 {
-
 	// Sprite sheet
 	SpriteBatchNode* spritebatch = SpriteBatchNode::create("sprites/megaman.pvr");
 	SpriteFrameCache* cache = SpriteFrameCache::sharedSpriteFrameCache();
@@ -40,6 +39,7 @@ void SynthHero::init(Layer* pParent)
 	_pHeroSprite = Sprite::createWithSpriteFrameName("walk_3.png");
 	spritebatch->addChild(_pHeroSprite);
 	spritebatch->setPosition(Point(200.f, 180.f)); 
+
 	_pParent = pParent;
 	_pParent->addChild(spritebatch, 1);
 
