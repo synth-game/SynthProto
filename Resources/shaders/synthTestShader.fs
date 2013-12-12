@@ -38,7 +38,7 @@ void main()
 				fDotTest = dot(lightPos1-samplePos, lightPos1-v_texCoord);
 				
 				vec4 texSample = texture2D(CC_Texture0, samplePos);
-				if(texSample.a > CC_alpha_value && fDotTest > 0) {
+				if(texSample.a > CC_alpha_value && fDotTest > 0.) {
 					noOcclusion = false;
 					break;
 				}
@@ -64,7 +64,7 @@ void main()
 				fDotTest = dot(lightPos2-samplePos, lightPos2-v_texCoord);
 				
 				vec4 texSample = texture2D(CC_Texture0, samplePos);
-				if(texSample.a > CC_alpha_value && fDotTest > 0) {
+				if(texSample.a > CC_alpha_value && fDotTest > 0.) {
 					noOcclusion = false;
 					break;
 				}
