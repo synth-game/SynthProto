@@ -3,8 +3,7 @@
 #include "SynthLevelBitmask.h"
 
 #include "Actor.h"
-
-#include "TestObject.h"
+#include "SpriteComponent.h"
 
 USING_NS_CC;
 
@@ -59,17 +58,9 @@ bool HelloWorld::init()
     /////////////////////////////
     // 3. add your codes below...
     
-    /*TestObject* t1 = new TestObject(1);
-    TestObject* t2 = new TestObject(2);*/
-    
     _hero = new Actor();
-    _hero->addComponent(MovementComponent::create());
-    _hero2 = new Actor();
-    _hero2->addComponent(MovementComponent::create());
-    
-    /*ActorMoveEvent* moveEvent1 = new ActorMoveEvent(_hero2);
-    EventDispatcher::getInstance()->dispatchEvent(moveEvent1);*/
-    //CCLOG("HERO ID = %d", _hero->getActorID());
+    _hero->addComponent(MovementComponent::create(200.f, 180.f));
+    _hero->addComponent(SpriteComponent::create(this, "sprites/megaman.pvr", "sprites/megaman.plist", "walk_3.png"));
     
 	// decor sprite
 	Sprite* pDecorSprite = Sprite::create("decor.jpg");
@@ -120,20 +111,21 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 {
 	CCLOG("KEY PRESSED");
-    ActorMoveEvent* moveEvent2 = new ActorMoveEvent(_hero2);
-    ActorMoveEvent* moveEvent1 = new ActorMoveEvent(_hero);
+    ActorMoveEvent* moveEvent = new ActorMoveEvent(_hero);
     auto dispatcher = EventDispatcher::getInstance();
     switch(keyCode) {
 	case EventKeyboard::KeyCode::KEY_Q:
 		//_pHero->walkLeft(true);
-        CCLOG("Dispatching ActorMoveEvent1");
-        dispatcher->dispatchEvent(moveEvent1);
+        moveEvent->setMoveDirection(MoveDirection::LEFT);
+        CCLOG("Dispatching ActorMoveEvent LEFT");
+        dispatcher->dispatchEvent(moveEvent);
 		break;
 
 	case EventKeyboard::KeyCode::KEY_D:
-        CCLOG("Dispatching ActorMoveEvent2");
-        dispatcher->dispatchEvent(moveEvent2);
+        moveEvent->setMoveDirection(MoveDirection::RIGHT);
 		//_pHero->walkRight(true);
+            CCLOG("Dispatching ActorMoveEvent RIGHT");
+            dispatcher->dispatchEvent(moveEvent);
 		break;
 
 	case EventKeyboard::KeyCode::KEY_SPACE:
@@ -173,6 +165,6 @@ void HelloWorld::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
 
 void HelloWorld::update(float delta)
 {
-    //_hero->update(delta);
+    _hero->update(delta);
 	//_pHero->move(delta);
 }

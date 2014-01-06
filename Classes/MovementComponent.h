@@ -22,15 +22,19 @@ enum class MoveState {
 class MovementComponent : public cocos2d::Component {
     
 public:
-    inline bool init() { CCLOG("MovementComponent init"); _posX = 0.0; _posY = 0.0; _moveState = MoveState::NOT_MOVING; initListeners(); addListeners(); setName(componentName); return true;};
+    inline bool init() { CCLOG("MovementComponent init"); _posX = 0.0; _posY = 0.0; _speedX = 0.0; _speedY = 0.0; _moveState = MoveState::NOT_MOVING; initListeners(); addListeners(); setName(componentName); return true;};
     static const char* componentName;
-    static MovementComponent* create();
+    static MovementComponent* create(float posX = 0.0, float posY = 0.0);
     void update(float delta);
+    inline float getPosX() { return _posX; }
+    inline float getPosY() { return _posY; }
     
 protected:
     MovementComponent();
     float _posX;
     float _posY;
+    float _speedX;
+    float _speedY;
     MoveState _moveState;
     void initListeners();
     void addListeners();
