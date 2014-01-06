@@ -14,7 +14,7 @@ const char* MovementComponent::componentName = "MovementComponent";
 
 MovementComponent::MovementComponent() : Component() {}
 
-MovementComponent* MovementComponent::create(void)
+MovementComponent* MovementComponent::create()
 {
     MovementComponent* pRet = new MovementComponent();
     if (pRet != NULL && pRet->init())
@@ -42,6 +42,20 @@ void MovementComponent::addListeners() {
 }
 
 void MovementComponent::onMoveEvent(cocos2d::EventCustom* event) {
-    CCLOG("MOVE EVENT RECEIVED BY MOVEMENT COMPONENT");
+    ActorMoveEvent* moveEvent = static_cast<ActorMoveEvent*>(event);
+    CCLOG("RECEIVED MOVE EVENT FROM SOURCE = %d", moveEvent->getSource()->getActorID());
+    Actor* eventSource = static_cast<Actor*>(moveEvent->getSource());
+    Actor* componentOwner = static_cast<Actor*>(_owner);
+    CCLOG("COMPONENT OWNER ID = %d", componentOwner->getActorID());
+    if (eventSource->getActorID() == componentOwner->getActorID()) {
+        CCLOG("MOVE EVENT RECEIVED BY MOVEMENT COMPONENT (ID ARE THE SAME = %d)", eventSource->getActorID());
+    }
+    else {
+        CCLOG("MOVE EVENT RECEIVED BUT ID NOT THE SAME");
+    }
+    
 }
 
+void MovementComponent::update(float delta) {
+    //CCLOG("MOVEMENT COMPONENT UPDATE");
+}

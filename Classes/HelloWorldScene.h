@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "SynthHero.h"
 #include "EventTypes.h"
+#include "Actor.h"
 
 class HelloWorld : public cocos2d::LayerColor
 {
@@ -32,6 +33,8 @@ public:
 
 private:
 	SynthHero* _pHero;
+    Actor* _hero;
+    
 };
 
 #endif // __HELLOWORLD_SCENE_H__

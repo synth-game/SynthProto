@@ -2,6 +2,8 @@
 
 #include "SynthLevelBitmask.h"
 
+#include "Actor.h"
+
 USING_NS_CC;
 
 HelloWorld::HelloWorld()
@@ -54,7 +56,10 @@ bool HelloWorld::init()
 
     /////////////////////////////
     // 3. add your codes below...
-
+    _hero = new Actor();
+    _hero->addComponent(MovementComponent::create());
+    CCLOG("HERO ID = %d", _hero->getActorID());
+    
 	// decor sprite
 	Sprite* pDecorSprite = Sprite::create("decor.jpg");
 	pDecorSprite->setAnchorPoint(Point(0,1));
@@ -78,7 +83,7 @@ bool HelloWorld::init()
 	pBgProgram->setUniformLocationWith2f(pBgProgram->getUniformLocationForName("uTexSize"), pBgSprite->getContentSize().width, pBgSprite->getContentSize().height);
 	pBgSprite->setShaderProgram(pBgProgram);
     
-	//hero
+	/*//hero
 	_pHero = new SynthHero();
 	_pHero->init(this);
 
@@ -86,7 +91,7 @@ bool HelloWorld::init()
 	SynthLevelBitmask* pSLB = new SynthLevelBitmask();
 	pSLB->initWithImageFile("background.png");
 	pSLB->setAbsolutePosition(pBgSprite->getPosition());
-	_pHero->setLevelBitmask(pSLB);
+	_pHero->setLevelBitmask(pSLB);*/
 
     return true;
 }
@@ -103,13 +108,24 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 
 void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 {
-	switch(keyCode) {
+    Actor* hero2 = new Actor();
+    hero2->addComponent(MovementComponent::create());
+	CCLOG("KEY PRESSED");
+    ActorMoveEvent* moveEvent = new ActorMoveEvent(hero2);
+    //ActorMoveEvent* moveEvent2 = new ActorMoveEvent(hero2);
+    //CCLOG("EVENT SOURCE IN ON KEY PRESSED IS NULL ? %d", moveEvent->getSource() == NULL);
+    auto dispatcher = EventDispatcher::getInstance();
+    switch(keyCode) {
 	case EventKeyboard::KeyCode::KEY_Q:
-		_pHero->walkLeft(true);		
+		//_pHero->walkLeft(true);
+        CCLOG("Dispatching ActorMoveEvent");
+        dispatcher->dispatchEvent(moveEvent);
 		break;
 
-	case EventKeyboard::KeyCode::KEY_D:	
-		_pHero->walkRight(true);
+	case EventKeyboard::KeyCode::KEY_D:
+        //CCLOG("Dispatching ActorMoveEvent2");
+        //dispatcher->dispatchEvent(moveEvent2);
+		//_pHero->walkRight(true);
 		break;
 
 	case EventKeyboard::KeyCode::KEY_SPACE:
@@ -126,15 +142,13 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 
 void HelloWorld::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *event)
 {
-	EventCustom* heroMoveEvent = new EventCustom(ACTOR_MOVE_EVENT);
-    heroMoveEvent->setUserData(_pHero);
     switch(keyCode) {
 	case EventKeyboard::KeyCode::KEY_Q:
-		_pHero->walkLeft(false);
+		//_pHero->walkLeft(false);
 		break;
 
 	case EventKeyboard::KeyCode::KEY_D:		
-		_pHero->walkRight(false);
+		//_pHero->walkRight(false);
 		break;
 
 	case EventKeyboard::KeyCode::KEY_SPACE:
@@ -151,7 +165,6 @@ void HelloWorld::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
 
 void HelloWorld::update(float delta)
 {
-	Node::update(delta);
-
-	_pHero->move(delta);
+    _hero->update(delta);
+	//_pHero->move(delta);
 }

@@ -30,7 +30,6 @@ SynthHero::~SynthHero()
 
 void SynthHero::init(Layer* pParent)
 {
-    movementComponent = MovementComponent::create();
     
 	// Sprite sheet
 	SpriteBatchNode* spritebatch = SpriteBatchNode::create("sprites/megaman.pvr");
@@ -63,23 +62,6 @@ void SynthHero::init(Layer* pParent)
                                                   1);
 	FiniteTimeAction* actionMoveDone = CallFuncN::create( CC_CALLBACK_1(SynthHero::spriteMoveFinished, this));
 	_pHeroSprite->runAction( Sequence::create(actionMove, actionMoveDone, NULL) );
-    
-    ActorMoveEvent* moveEvent = new ActorMoveEvent();
-    auto dispatcher = EventDispatcher::getInstance();
-    CCLOG("Dispatching ActorMoveEvent");
-    dispatcher->dispatchEvent(moveEvent);
-    /*EventCustom testEvent("testEvent");
-    auto dispatcher = EventDispatcher::getInstance();
-    auto listener1 = EventListenerCustom::create("testEvent",[=](EventCustom* event) {
-        CCLOG("CALLBACK 1");
-    });
-    auto listener2 = EventListenerCustom::create("testEvent",[=](EventCustom* event) {
-        CCLOG("CALLBACK 2");
-        event->stopPropagation();
-    });
-    dispatcher->addEventListenerWithFixedPriority(listener1, 3);
-    dispatcher->addEventListenerWithFixedPriority(listener2, 2);
-    dispatcher->dispatchEvent(&testEvent);*/
 }
 
 void SynthHero::testEventCallback1(EventCustom* testEvent) {

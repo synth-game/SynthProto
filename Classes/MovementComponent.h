@@ -11,6 +11,7 @@
 
 #include "cocos2d.h"
 #include "ActorMoveEvent.h"
+#include "Actor.h"
 
 enum class MoveState {
     NOT_MOVING,
@@ -24,6 +25,7 @@ public:
     inline bool init() { CCLOG("MovementComponent init"); _posX = 0.0; _posY = 0.0; _moveState = MoveState::NOT_MOVING; initListeners(); addListeners(); setName(componentName); return true;};
     static const char* componentName;
     static MovementComponent* create();
+    void update(float delta);
     
 protected:
     MovementComponent();
