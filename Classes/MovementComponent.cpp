@@ -42,6 +42,7 @@ void MovementComponent::addListeners() {
 }
 
 void MovementComponent::onMoveEvent(cocos2d::EventCustom* event) {
+    CCLOG("RECEIVED MOVE EVENT IN COMPONENT = %d", _ID);
     ActorMoveEvent* moveEvent = static_cast<ActorMoveEvent*>(event);
     CCLOG("RECEIVED MOVE EVENT FROM SOURCE = %d", moveEvent->getSource()->getActorID());
     Actor* eventSource = static_cast<Actor*>(moveEvent->getSource());

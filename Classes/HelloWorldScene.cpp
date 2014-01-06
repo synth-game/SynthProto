@@ -4,6 +4,8 @@
 
 #include "Actor.h"
 
+#include "TestObject.h"
+
 USING_NS_CC;
 
 HelloWorld::HelloWorld()
@@ -56,9 +58,18 @@ bool HelloWorld::init()
 
     /////////////////////////////
     // 3. add your codes below...
+    
+    /*TestObject* t1 = new TestObject(1);
+    TestObject* t2 = new TestObject(2);*/
+    
     _hero = new Actor();
     _hero->addComponent(MovementComponent::create());
-    CCLOG("HERO ID = %d", _hero->getActorID());
+    _hero2 = new Actor();
+    _hero2->addComponent(MovementComponent::create());
+    
+    /*ActorMoveEvent* moveEvent1 = new ActorMoveEvent(_hero2);
+    EventDispatcher::getInstance()->dispatchEvent(moveEvent1);*/
+    //CCLOG("HERO ID = %d", _hero->getActorID());
     
 	// decor sprite
 	Sprite* pDecorSprite = Sprite::create("decor.jpg");
@@ -108,23 +119,20 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 
 void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 {
-    Actor* hero2 = new Actor();
-    hero2->addComponent(MovementComponent::create());
 	CCLOG("KEY PRESSED");
-    ActorMoveEvent* moveEvent = new ActorMoveEvent(hero2);
-    //ActorMoveEvent* moveEvent2 = new ActorMoveEvent(hero2);
-    //CCLOG("EVENT SOURCE IN ON KEY PRESSED IS NULL ? %d", moveEvent->getSource() == NULL);
+    ActorMoveEvent* moveEvent2 = new ActorMoveEvent(_hero2);
+    ActorMoveEvent* moveEvent1 = new ActorMoveEvent(_hero);
     auto dispatcher = EventDispatcher::getInstance();
     switch(keyCode) {
 	case EventKeyboard::KeyCode::KEY_Q:
 		//_pHero->walkLeft(true);
-        CCLOG("Dispatching ActorMoveEvent");
-        dispatcher->dispatchEvent(moveEvent);
+        CCLOG("Dispatching ActorMoveEvent1");
+        dispatcher->dispatchEvent(moveEvent1);
 		break;
 
 	case EventKeyboard::KeyCode::KEY_D:
-        //CCLOG("Dispatching ActorMoveEvent2");
-        //dispatcher->dispatchEvent(moveEvent2);
+        CCLOG("Dispatching ActorMoveEvent2");
+        dispatcher->dispatchEvent(moveEvent2);
 		//_pHero->walkRight(true);
 		break;
 
@@ -165,6 +173,6 @@ void HelloWorld::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
 
 void HelloWorld::update(float delta)
 {
-    _hero->update(delta);
+    //_hero->update(delta);
 	//_pHero->move(delta);
 }

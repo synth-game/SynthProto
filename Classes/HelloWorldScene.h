@@ -34,6 +34,7 @@ public:
 private:
 	SynthHero* _pHero;
     Actor* _hero;
+    Actor* _hero2;
     
 };
 
