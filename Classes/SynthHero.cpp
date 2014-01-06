@@ -30,6 +30,8 @@ SynthHero::~SynthHero()
 
 void SynthHero::init(Layer* pParent)
 {
+    movementComponent = MovementComponent::create();
+    
 	// Sprite sheet
 	SpriteBatchNode* spritebatch = SpriteBatchNode::create("sprites/megaman.pvr");
 	SpriteFrameCache* cache = SpriteFrameCache::sharedSpriteFrameCache();
@@ -55,6 +57,41 @@ void SynthHero::init(Layer* pParent)
 	}
 	_walkAnimation = Animate::create(Animation::createWithSpriteFrames(animFrames, 0.1f));
     _walkAnimation->retain();
+    FiniteTimeAction* actionMove = JumpTo::create( 1.f,
+                                                  Point(0 - _pHeroSprite->getContentSize().width/2, 50.f),
+                                                  50.f,
+                                                  1);
+	FiniteTimeAction* actionMoveDone = CallFuncN::create( CC_CALLBACK_1(SynthHero::spriteMoveFinished, this));
+	_pHeroSprite->runAction( Sequence::create(actionMove, actionMoveDone, NULL) );
+    
+    ActorMoveEvent* moveEvent = new ActorMoveEvent();
+    auto dispatcher = EventDispatcher::getInstance();
+    CCLOG("Dispatching ActorMoveEvent");
+    dispatcher->dispatchEvent(moveEvent);
+    /*EventCustom testEvent("testEvent");
+    auto dispatcher = EventDispatcher::getInstance();
+    auto listener1 = EventListenerCustom::create("testEvent",[=](EventCustom* event) {
+        CCLOG("CALLBACK 1");
+    });
+    auto listener2 = EventListenerCustom::create("testEvent",[=](EventCustom* event) {
+        CCLOG("CALLBACK 2");
+        event->stopPropagation();
+    });
+    dispatcher->addEventListenerWithFixedPriority(listener1, 3);
+    dispatcher->addEventListenerWithFixedPriority(listener2, 2);
+    dispatcher->dispatchEvent(&testEvent);*/
+}
+
+void SynthHero::testEventCallback1(EventCustom* testEvent) {
+    CCLOG("CALLBACK 1");
+}
+
+void SynthHero::testEventCallback2(EventCustom* testEvent) {
+    CCLOG("CALLBACK 2");
+}
+
+void SynthHero::spriteMoveFinished(Node* sender) {
+    CCLOG("Sprite move finished");
 }
 
 void SynthHero::walkLeft(bool bStart)
@@ -136,7 +173,7 @@ void SynthHero::move(float fDt)
 	}
 
 	Point nextHeroPosition = _pHeroSprite->getPosition() + (_currentSpeed * fDt);
-	CCLOG("hero position : (%f, %f)", _pHeroSprite->getPosition().x, _pHeroSprite->getPosition().y);
+	//CCLOG("hero position : (%f, %f)", _pHeroSprite->getPosition().x, _pHeroSprite->getPosition().y);
 	//_pLevelBitmask->bitmaskCollisionTest(this, nextHeroPosition);
 
 	/* Hero sprite */

@@ -2,15 +2,19 @@
 #define __SYNTH_HERO_H__
 
 #include "cocos2d.h"
+#include "MovementComponent.h"
+#include "ActorMoveEvent.h"
 
 class SynthLevelBitmask;
 
-class SynthHero
+class SynthHero : public cocos2d::Node
 {
 public:
 	SynthHero();
 	~SynthHero();
-
+    
+    MovementComponent* movementComponent;
+    
 	void init(cocos2d::Layer* pParent);
 
 	void walkLeft(bool bStart);
@@ -31,6 +35,9 @@ public:
 	cocos2d::Point getSpeed() { return _currentSpeed; }
 
 	void setLevelBitmask(SynthLevelBitmask* pLevelBitmask) { _pLevelBitmask = pLevelBitmask; }
+    void spriteMoveFinished(cocos2d::Node* sender);
+    void testEventCallback2(cocos2d::EventCustom* testEvent);
+    void testEventCallback1(cocos2d::EventCustom* testEvent);
 
 private:
 	inline float sign(float f) { if(f>0) {return 1.f;} else {return -1.f;} }

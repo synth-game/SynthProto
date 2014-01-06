@@ -126,7 +126,9 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 
 void HelloWorld::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *event)
 {
-	switch(keyCode) {
+	EventCustom* heroMoveEvent = new EventCustom(ACTOR_MOVE_EVENT);
+    heroMoveEvent->setUserData(_pHero);
+    switch(keyCode) {
 	case EventKeyboard::KeyCode::KEY_Q:
 		_pHero->walkLeft(false);
 		break;

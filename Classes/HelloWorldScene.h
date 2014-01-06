@@ -3,6 +3,7 @@
 
 #include "cocos2d.h"
 #include "SynthHero.h"
+#include "EventTypes.h"
 
 class HelloWorld : public cocos2d::LayerColor
 {
