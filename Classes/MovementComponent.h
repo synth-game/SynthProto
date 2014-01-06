@@ -13,10 +13,15 @@
 #include "ActorMoveEvent.h"
 #include "Actor.h"
 
+#define MAX_HORIZ_SPEED 200.f
+#define MAX_JUMP_SPEED 400.f
+#define MAX_FALL_SPEED 300.f
+
 enum class MoveState {
     NOT_MOVING,
     MOVING,
-    JUMPING
+    JUMPING,
+    FALLING
 };
 
 class MovementComponent : public cocos2d::Component {
@@ -31,15 +36,21 @@ public:
     
 protected:
     MovementComponent();
+    bool isSameOwner();
+    inline float sign(float f) { if(f>0) {return 1.f;} else {return -1.f;} }
+    
+	float _speedX;
+    float _speedY;
     float _posX;
     float _posY;
-    float _speedX;
-    float _speedY;
     MoveState _moveState;
     void initListeners();
     void addListeners();
     void onMoveEvent(cocos2d::EventCustom* event);
+    void onStopMovingEvent(cocos2d::EventCustom* event);
     cocos2d::EventListenerCustom* _actorMoveEventListener;
+    cocos2d::EventListenerCustom* _actorStopMovingEventListener;
+
 };
 
 #endif

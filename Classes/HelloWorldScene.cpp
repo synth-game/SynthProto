@@ -3,7 +3,8 @@
 #include "SynthLevelBitmask.h"
 
 #include "Actor.h"
-#include "SpriteComponent.h"
+#include "AnimatedSpriteComponent.h"
+#include "ActorStopMovingEvent.h"
 
 USING_NS_CC;
 
@@ -60,7 +61,7 @@ bool HelloWorld::init()
     
     _hero = new Actor();
     _hero->addComponent(MovementComponent::create(200.f, 180.f));
-    _hero->addComponent(SpriteComponent::create(this, "sprites/megaman.pvr", "sprites/megaman.plist", "walk_3.png"));
+    _hero->addComponent(AnimatedSpriteComponent::create(this, "sprites/megaman.pvr", "sprites/megaman.plist", "walk_3.png"));
     
 	// decor sprite
 	Sprite* pDecorSprite = Sprite::create("decor.jpg");
@@ -124,15 +125,8 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 	case EventKeyboard::KeyCode::KEY_D:
         moveEvent->setMoveDirection(MoveDirection::RIGHT);
 		//_pHero->walkRight(true);
-            CCLOG("Dispatching ActorMoveEvent RIGHT");
-            dispatcher->dispatchEvent(moveEvent);
-		break;
-
-	case EventKeyboard::KeyCode::KEY_SPACE:
-		if(!_pHero->isJumping() && !_pHero->isFalling())
-		{
-			_pHero->jump();
-		}
+        CCLOG("Dispatching ActorMoveEvent RIGHT");
+        dispatcher->dispatchEvent(moveEvent);
 		break;
 
 	default:
@@ -142,22 +136,14 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 
 void HelloWorld::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *event)
 {
+    CCLOG("KEY RELEASED");
+    ActorStopMovingEvent* stopMovingEvent = new ActorStopMovingEvent(_hero);
+    auto dispatcher = EventDispatcher::getInstance();
     switch(keyCode) {
-	case EventKeyboard::KeyCode::KEY_Q:
-		//_pHero->walkLeft(false);
-		break;
-
+    case EventKeyboard::KeyCode::KEY_Q:
 	case EventKeyboard::KeyCode::KEY_D:		
-		//_pHero->walkRight(false);
+        dispatcher->dispatchEvent(stopMovingEvent);
 		break;
-
-	case EventKeyboard::KeyCode::KEY_SPACE:
-		if(_pHero->isJumping())
-		{
-			_pHero->fall();
-		}
-		break;
-
 	default:
 		break;
 	}

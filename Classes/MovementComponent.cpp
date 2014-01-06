@@ -9,6 +9,7 @@
 #include "cocos2d.h"
 #include "MovementComponent.h"
 #include "ActorMoveEvent.h"
+#include "ActorStopMovingEvent.h"
 
 const char* MovementComponent::componentName = "MovementComponent";
 
@@ -34,12 +35,15 @@ MovementComponent* MovementComponent::create(float posX, float posY) {
 void MovementComponent::initListeners() {
     CCLOG("MovementComponent init listeners");
     _actorMoveEventListener = cocos2d::EventListenerCustom::create(ActorMoveEvent::eventName, CC_CALLBACK_1(MovementComponent::onMoveEvent, this));
+    _actorStopMovingEventListener = cocos2d::EventListenerCustom::create(ActorStopMovingEvent::eventName, CC_CALLBACK_1(MovementComponent::onStopMovingEvent, this));
+
 }
 
 void MovementComponent::addListeners() {
     CCLOG("MovementComponenet add listeners");
     auto dispatcher = cocos2d::EventDispatcher::getInstance();
     dispatcher->addEventListenerWithFixedPriority(_actorMoveEventListener, 1);
+    dispatcher->addEventListenerWithFixedPriority(_actorStopMovingEventListener, 1);
 }
 
 void MovementComponent::onMoveEvent(cocos2d::EventCustom* event) {
@@ -53,21 +57,13 @@ void MovementComponent::onMoveEvent(cocos2d::EventCustom* event) {
         CCLOG("MOVE EVENT RECEIVED BY MOVEMENT COMPONENT (ID ARE THE SAME = %d)", eventSource->getActorID());
         _moveState = MoveState::MOVING;
         switch (moveEvent->getDirection()) {
-            case MoveDirection::TOP:
-                _speedX = 0;
-                _speedY = 1;
-                break;
             case MoveDirection::RIGHT:
-                _speedX = 1;
-                _speedY = 0;
+                _speedX = 1.0;
+                _speedY = 0.0;
                 break;
             case MoveDirection::LEFT:
-                _speedX = -1;
-                _speedY = 0;
-                break;
-            case MoveDirection::BOTTOM:
-                _speedX = 0;
-                _speedY = -1;
+                _speedX = -1.0;
+                _speedY = 0.0;
                 break;
             default:
                 break;
@@ -79,10 +75,18 @@ void MovementComponent::onMoveEvent(cocos2d::EventCustom* event) {
     
 }
 
+void MovementComponent::onStopMovingEvent(cocos2d::EventCustom* event) {
+    ActorStopMovingEvent* stopMovingEvent = static_cast<ActorStopMovingEvent*>(event);
+    Actor* eventSource = static_cast<Actor*>(stopMovingEvent->getSource());
+    Actor* componentOwner = static_cast<Actor*>(_owner);
+    if (eventSource->getActorID() == componentOwner->getActorID()) {
+        _moveState = MoveState::NOT_MOVING;
+    }
+}
+
 void MovementComponent::update(float delta) {
     if (_moveState == MoveState::MOVING) {
         _posX += _speedX;
         _posY += _speedY;
-        CCLOG("POSITION (%.2f,%.2f)", _posX, _posY);
     }
 }
