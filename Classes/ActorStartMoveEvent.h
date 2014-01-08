@@ -7,7 +7,7 @@
 //
 
 #ifndef HelloCpp_ActorMoveEvent_h
-#define HelloCpp_ActorMoveEvent_h
+#define HelloCpp_ActorStartMoveEvent_h
 
 #include "cocos2d.h"
 #include "Actor.h"
@@ -19,18 +19,18 @@ enum class MoveDirection { // a priori on ne peut que se diriger dans les 4 dire
     LEFT
 };
 
-class ActorMoveEvent : public cocos2d::EventCustom {
+class ActorStartMoveEvent : public cocos2d::EventCustom {
     
 public:
-    ActorMoveEvent(Actor* source);
+    ActorStartMoveEvent(Actor* source);
     static const char* eventName;
     inline Actor* getSource() { return _source; }
-    inline void setMoveDirection(MoveDirection direction) { _direction = direction; }
-    inline MoveDirection getDirection() { return _direction; }
+	cocos2d::Point	_targetSpeed;
+	bool			_bChangeX;
+	bool			_bChangeY;
     
 protected:
     Actor* _source;
-    MoveDirection _direction;
     
 };
 

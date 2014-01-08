@@ -8,21 +8,29 @@
 
 #include "cocos2d.h"
 #include "MovementComponent.h"
-#include "ActorMoveEvent.h"
-#include "ActorStopMovingEvent.h"
+#include "GeometryComponent.h"
+#include "ActorStartMoveEvent.h"
+#include "ActorCollisionEvent.h"
 
-const char* MovementComponent::componentName = "MovementComponent";
+USING_NS_CC;
 
-MovementComponent::MovementComponent() : Component() {}
+const char* MovementComponent::COMPONENT_TYPE = "MovementComponent";
 
-MovementComponent* MovementComponent::create(float posX, float posY) {
+
+bool MovementComponent::init() {
+	SynthComponent::init(MovementComponent::COMPONENT_TYPE);
+	return true;
+}
+
+MovementComponent* MovementComponent::create(Point& speed, Point& targetSpeed, Point& acceleration) {
     MovementComponent* pRet = new MovementComponent();
     if (pRet != NULL && pRet->init())
     {
         CCLOG("MovementComponent create");
         pRet->autorelease();
-        pRet->_posX = posX;
-        pRet->_posY = posY;
+        pRet->_speed = speed;
+        pRet->_targetSpeed = targetSpeed;
+		pRet->_acceleration = acceleration;
     }
     else
     {
@@ -34,59 +42,68 @@ MovementComponent* MovementComponent::create(float posX, float posY) {
 
 void MovementComponent::initListeners() {
     CCLOG("MovementComponent init listeners");
-    _actorMoveEventListener = cocos2d::EventListenerCustom::create(ActorMoveEvent::eventName, CC_CALLBACK_1(MovementComponent::onMoveEvent, this));
-    _actorStopMovingEventListener = cocos2d::EventListenerCustom::create(ActorStopMovingEvent::eventName, CC_CALLBACK_1(MovementComponent::onStopMovingEvent, this));
-
+	_pChangeMoveEventListener = cocos2d::EventListenerCustom::create(ActorStartMoveEvent::eventName, CC_CALLBACK_1(MovementComponent::onChangeMove, this));
 }
 
 void MovementComponent::addListeners() {
     CCLOG("MovementComponenet add listeners");
     auto dispatcher = cocos2d::EventDispatcher::getInstance();
-    dispatcher->addEventListenerWithFixedPriority(_actorMoveEventListener, 1);
-    dispatcher->addEventListenerWithFixedPriority(_actorStopMovingEventListener, 1);
+    dispatcher->addEventListenerWithFixedPriority(_pChangeMoveEventListener, 1);
 }
 
-void MovementComponent::onMoveEvent(cocos2d::EventCustom* event) {
-    CCLOG("RECEIVED MOVE EVENT IN COMPONENT = %d", _ID);
-    ActorMoveEvent* moveEvent = static_cast<ActorMoveEvent*>(event);
-    CCLOG("RECEIVED MOVE EVENT FROM SOURCE = %d", moveEvent->getSource()->getActorID());
-    Actor* eventSource = static_cast<Actor*>(moveEvent->getSource());
+void MovementComponent::onChangeMove(cocos2d::EventCustom* event) {
+    ActorStartMoveEvent* startMoveEvent = static_cast<ActorStartMoveEvent*>(event);
+    Actor* eventSource = static_cast<Actor*>(startMoveEvent->getSource());
     Actor* componentOwner = static_cast<Actor*>(_owner);
-    CCLOG("COMPONENT OWNER ID = %d", componentOwner->getActorID());
     if (eventSource->getActorID() == componentOwner->getActorID()) {
-        CCLOG("MOVE EVENT RECEIVED BY MOVEMENT COMPONENT (ID ARE THE SAME = %d)", eventSource->getActorID());
-        _moveState = MoveState::MOVING;
-        switch (moveEvent->getDirection()) {
-            case MoveDirection::RIGHT:
-                _speedX = 1.0;
-                _speedY = 0.0;
-                break;
-            case MoveDirection::LEFT:
-                _speedX = -1.0;
-                _speedY = 0.0;
-                break;
-            default:
-                break;
-        }
+		CCLOG("CHANGEMOVE EVENT RECEIVED IN MOVEMEMENT COMPONENT");
+		if(startMoveEvent->_bChangeX) {
+			_targetSpeed.x = startMoveEvent->_targetSpeed.x;
+		}
+		
+		if(startMoveEvent->_bChangeY) {
+			_targetSpeed.y = startMoveEvent->_targetSpeed.y;
+		}
     }
     else {
-        CCLOG("MOVE EVENT RECEIVED BUT ID NOT THE SAME");
+        CCLOG("CHANGEMOVE EVENT RECEIVED BUT ID NOT THE SAME");
     }
     
 }
 
-void MovementComponent::onStopMovingEvent(cocos2d::EventCustom* event) {
-    ActorStopMovingEvent* stopMovingEvent = static_cast<ActorStopMovingEvent*>(event);
-    Actor* eventSource = static_cast<Actor*>(stopMovingEvent->getSource());
-    Actor* componentOwner = static_cast<Actor*>(_owner);
-    if (eventSource->getActorID() == componentOwner->getActorID()) {
-        _moveState = MoveState::NOT_MOVING;
-    }
-}
+void MovementComponent::update(float fDt) {
+    //if the hero is moving or has to move
+	if(!_targetSpeed.equals(Point::ZERO) || !_speed.equals(Point::ZERO)) {
 
-void MovementComponent::update(float delta) {
-    if (_moveState == MoveState::MOVING) {
-        _posX += _speedX;
-        _posY += _speedY;
-    }
+		//compute next speed
+		Point direction(sign(_targetSpeed.x-_speed.x), sign(_targetSpeed.y-_speed.y));
+		_speed = _speed + Point(direction.x*_acceleration.x, direction.y*_acceleration.y);
+
+		//cap the next speed
+		if(sign(_targetSpeed.x - _speed.x) != direction.x) _speed.x = _targetSpeed.x;
+		if(sign(_targetSpeed.y - _speed.y) != direction.y) _speed.y = _targetSpeed.y;
+
+		//compute next position
+		GeometryComponent* pGeometryComponent = static_cast<GeometryComponent*>(_owner->getComponent(GeometryComponent::COMPONENT_TYPE));
+		CCASSERT(pGeometryComponent != NULL, "MovementComponent need a GeometryComponent added to its owner");
+
+		Point nextPosition = pGeometryComponent->_position + (_speed * fDt);
+
+		//send event for collision
+		ActorCollisionEvent* pNeedTestCollisionEvent = new ActorCollisionEvent(static_cast<Actor*>(_owner));
+		pNeedTestCollisionEvent->_currentPosition = pGeometryComponent->_position;
+		pNeedTestCollisionEvent->_targetPosition = nextPosition;
+		EventDispatcher::getInstance()->dispatchEvent(pNeedTestCollisionEvent);
+
+		//determine jump end
+		if(_targetSpeed.y == _speed.y && _targetSpeed.y > 0)
+		{
+			ActorStartMoveEvent* pFallEvent = new ActorStartMoveEvent(static_cast<Actor*>(_owner));
+			pFallEvent->_targetSpeed = Point(0, 300.f);
+			pFallEvent->_bChangeX = false;
+			pFallEvent->_bChangeY = true;
+
+			EventDispatcher::getInstance()->dispatchEvent(pFallEvent);
+		}
+	}
 }

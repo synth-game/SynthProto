@@ -3,7 +3,6 @@
 
 #include "cocos2d.h"
 #include "MovementComponent.h"
-#include "ActorMoveEvent.h"
 
 class SynthLevelBitmask;
 

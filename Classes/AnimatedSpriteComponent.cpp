@@ -8,7 +8,8 @@
 
 #include "cocos2d.h"
 #include "AnimatedSpriteComponent.h"
-#include "ActorStopMovingEvent.h"
+#include "ActorStartMoveEvent.h"
+#include "GeometryComponent.h"
 
 const char* AnimatedSpriteComponent::componentName = "AnimatedSpriteComponent";
 
@@ -64,38 +65,38 @@ bool AnimatedSpriteComponent::init() {
 }
 
 void AnimatedSpriteComponent::onEnter() { //Appelée après l'ajout dans le componentContainer par la classe Node (avant le owner n'est pas défini)
-    _movementComponent = static_cast<MovementComponent*>(_owner->getComponent(MovementComponent::componentName));
-    CCASSERT(_movementComponent != NULL, "SpriteComponent need a MovementComponent added to its owner"); //Ici ça sous-entend qu'on ne peut pas créer de sprite qui n'ait pas besoin de bouger, ce qui est donc injuste. D'où la nécessité de passer plutôt par un PositionComponent par la suite qui se charge simplement de la position de l'objet.
-    _spriteBatch->setPosition(cocos2d::Point(_movementComponent->getPosX(), _movementComponent->getPosY()));
+	_geometryComponent = static_cast<GeometryComponent*>(_owner->getComponent(GeometryComponent::COMPONENT_TYPE));
+    CCASSERT(_geometryComponent != NULL, "SpriteComponent need a GeometryComponent added to its owner"); //Ici ça sous-entend qu'on ne peut pas créer de sprite qui n'ait pas besoin de bouger, ce qui est donc injuste. D'où la nécessité de passer plutôt par un PositionComponent par la suite qui se charge simplement de la position de l'objet.
+	_spriteBatch->setPosition(_geometryComponent->_position);
 }
 
 void AnimatedSpriteComponent::initListeners() {
     CCLOG("SpriteComponent init listeners");
-    _actorMoveEventListener = cocos2d::EventListenerCustom::create(ActorMoveEvent::eventName, CC_CALLBACK_1(AnimatedSpriteComponent::onMoveEvent, this));
-    _actorStopMovingEventListener = cocos2d::EventListenerCustom::create(ActorStopMovingEvent::eventName, CC_CALLBACK_1(AnimatedSpriteComponent::onStopMovingEvent, this));
-    
+	_actorMoveEventListener = cocos2d::EventListenerCustom::create(ActorStartMoveEvent::eventName, CC_CALLBACK_1(AnimatedSpriteComponent::onMoveEvent, this));    
 }
 
 void AnimatedSpriteComponent::addListeners() {
     CCLOG("SpriteComponent add listeners");
     auto dispatcher = cocos2d::EventDispatcher::getInstance();
     dispatcher->addEventListenerWithFixedPriority(_actorMoveEventListener, 1);
-    dispatcher->addEventListenerWithFixedPriority(_actorStopMovingEventListener, 1);
 }
 
 void AnimatedSpriteComponent::onMoveEvent(cocos2d::EventCustom* event) {
-    ActorMoveEvent* moveEvent = static_cast<ActorMoveEvent*>(event);
+    ActorStartMoveEvent* moveEvent = static_cast<ActorStartMoveEvent*>(event);
     Actor* eventSource = static_cast<Actor*>(moveEvent->getSource());
     Actor* componentOwner = static_cast<Actor*>(_owner);
     if (eventSource->getActorID() == componentOwner->getActorID()) {
-        if (moveEvent->getDirection() == MoveDirection::LEFT) {
+		if (moveEvent->_targetSpeed.x < 0) {
             _sprite->setFlippedX(true);
             _sprite->runAction(cocos2d::RepeatForever::create( _walkAnimation ));
         }
-        else {
+        else if(moveEvent->_targetSpeed.x > 0) {
             _sprite->setFlippedX(false);
             _sprite->runAction(cocos2d::RepeatForever::create( _walkAnimation ));
         }
+		else {
+			_sprite->stopAllActions();
+		}
     }
     else {
         CCLOG("MOVE EVENT RECEIVED BUT ID NOT THE SAME");
@@ -103,24 +104,9 @@ void AnimatedSpriteComponent::onMoveEvent(cocos2d::EventCustom* event) {
     
 }
 
-void AnimatedSpriteComponent::onStopMovingEvent(cocos2d::EventCustom* event) {
-    ActorStopMovingEvent* stopMovingEvent = static_cast<ActorStopMovingEvent*>(event);
-    Actor* eventSource = static_cast<Actor*>(stopMovingEvent->getSource());
-    Actor* componentOwner = static_cast<Actor*>(_owner);
-    if (eventSource->getActorID() == componentOwner->getActorID()) {
-        _sprite->stopAllActions();
-        //_sprite->setDisplayFrame(static_cast<cocos2d::SpriteFrame*>(_animFrames->getObjectAtIndex(0)));
-    }
-    else {
-        CCLOG("STOP MOVE EVENT RECEIVED BUT ID NOT THE SAME");
-    }
-    
-}
-
-
 void AnimatedSpriteComponent::update(float delta) {
     //CCLOG("SPRITE UPDATE");
-    _spriteBatch->setPosition(cocos2d::Point(_movementComponent->getPosX(), _movementComponent->getPosY()));
+	_spriteBatch->setPosition(_geometryComponent->_position);
 }
 
 

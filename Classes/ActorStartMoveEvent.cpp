@@ -6,11 +6,11 @@
 //
 //
 
-#include "ActorMoveEvent.h"
+#include "ActorStartMoveEvent.h"
 
-const char* ActorMoveEvent::eventName = "actor_move_event";
+const char* ActorStartMoveEvent::eventName = "actor_start_move_event";
 
-ActorMoveEvent::ActorMoveEvent(Actor* source) : EventCustom(eventName) {
+ActorStartMoveEvent::ActorStartMoveEvent(Actor* source) : EventCustom(eventName) {
     _source = source;
     const char * c = getType().c_str();
     CCLOG("ActoreMoveEvent type = %s", c);
