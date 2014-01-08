@@ -136,6 +136,14 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
         dispatcher->dispatchEvent(moveEvent);
 		break;
 
+	case EventKeyboard::KeyCode::KEY_SPACE:
+		moveEvent->_targetSpeed = Point(0.f, 400.f);
+		moveEvent->_bChangeX = false;
+		moveEvent->_bChangeY = true;
+		CCLOG("Dispatching ActorStartMoveEvent JUMP");
+        dispatcher->dispatchEvent(moveEvent);
+		break;
+
 	default:
 		break;
 	}
