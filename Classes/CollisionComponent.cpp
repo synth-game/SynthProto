@@ -1,4 +1,6 @@
 #include "CollisionComponent.h"
+#include "GeometryComponent.h"
+#include "MovementComponent.h"
 #include "ActorCollisionEvent.h"
 #include "ActorStartMoveEvent.h"
 #include "ActorChangePositionEvent.h"
@@ -59,5 +61,24 @@ void CollisionComponent::onTestCollision(EventCustom* event) {
 
 	} else {
 		CCLOG("COLLISION EVENT RECEIVED BUT ID NOT THE SAME");
+	}
+}
+
+void CollisionComponent::update(float fDt) {
+	GeometryComponent* pGeometryComponent = static_cast<GeometryComponent*>(_owner->getComponent(GeometryComponent::COMPONENT_TYPE));
+	CCASSERT(pGeometryComponent != NULL, "CollisionComponent need a GeometryComponent added to its owner");
+
+	MovementComponent* pMovementComponent = static_cast<MovementComponent*>(_owner->getComponent(MovementComponent::COMPONENT_TYPE));
+	CCASSERT(pGeometryComponent != NULL, "CollisionComponent need a MovementComponent added to its owner");
+
+	if(pMovementComponent->_targetSpeed.y <= 0.) {
+		if(_pBitmask->fallTest(pGeometryComponent->_position, pGeometryComponent->_size)) {
+			ActorStartMoveEvent* pFallEvent = new ActorStartMoveEvent(static_cast<Actor*>(_owner));
+			pFallEvent->_targetSpeed = Point(0, -300.f);
+			pFallEvent->_bChangeX = false;
+			pFallEvent->_bChangeY = true;
+
+			EventDispatcher::getInstance()->dispatchEvent(pFallEvent);
+		}
 	}
 }

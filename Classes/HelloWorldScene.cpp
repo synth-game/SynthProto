@@ -81,7 +81,7 @@ bool HelloWorld::init()
 	pSLB->setAbsolutePosition(pBgSprite->getPosition());
     
     _hero = new Actor();
-	_hero->addComponent(GeometryComponent::create(Point(200.f, 180.f), Size(74.f, 74.f), 0.f, Point(0.5f, 0.5f)));
+	_hero->addComponent(GeometryComponent::create(Point(200.f, 190.f), Size(74.f, 74.f), 0.f, Point(0.5f, 0.5f)));
 	_hero->addComponent(CollisionComponent::create(pSLB));
 	_hero->addComponent(MovementComponent::create(Point(0.f, 0.f), Point(0.f, 0.f), Point(20.f, 20.f)));
     _hero->addComponent(AnimatedSpriteComponent::create(this, "sprites/megaman.pvr", "sprites/megaman.plist", "walk_3.png"));

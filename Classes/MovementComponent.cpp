@@ -100,7 +100,7 @@ void MovementComponent::update(float fDt) {
 		if(_targetSpeed.y == _speed.y && _targetSpeed.y > 0)
 		{
 			ActorStartMoveEvent* pFallEvent = new ActorStartMoveEvent(static_cast<Actor*>(_owner));
-			pFallEvent->_targetSpeed = Point(0, 300.f);
+			pFallEvent->_targetSpeed = Point(0, -300.f);
 			pFallEvent->_bChangeX = false;
 			pFallEvent->_bChangeY = true;
 

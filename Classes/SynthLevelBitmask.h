@@ -13,6 +13,7 @@ public:
 	void setAbsolutePosition(const cocos2d::Point& absolutePosition) { _absolutePosition = absolutePosition; }
 	
 	cocos2d::Point bitmaskCollisionTest(cocos2d::Point& currentPosition, cocos2d::Size& size, cocos2d::Point& nextPosition);
+	bool	fallTest(cocos2d::Point& currentPosition, cocos2d::Size& size);
 
 	void printData();
 
@@ -20,12 +21,12 @@ private:
 	enum EDirection
 	{
 		eTop,
+		eBottom,
 		eLeft,
 		eRight
 	};
 
 	bool	isOnGround(cocos2d::Point& currentPosition, cocos2d::Size& size);
-	void	fallTest(SynthHero* pHero, cocos2d::Point& nextPosition);
 	cocos2d::Point	groundLateralTest(cocos2d::Point& currentPosition, cocos2d::Size& size, cocos2d::Point& nextPosition);
 	cocos2d::Point	boundingTest(cocos2d::Point& currentPosition, cocos2d::Size& size, cocos2d::Point& nextPosition,  EDirection dir);
 	
