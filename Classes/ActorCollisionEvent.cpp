@@ -13,5 +13,5 @@ const char* ActorCollisionEvent::eventName = "actor_collision_event";
 ActorCollisionEvent::ActorCollisionEvent(Actor* source) : EventCustom(eventName) {
     _source = source;
     const char * c = getType().c_str();
-    CCLOG("ActorCollisionEvent type = %s", c);
+    //CCLOG("ActorCollisionEvent type = %s", c);
 }

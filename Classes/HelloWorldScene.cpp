@@ -6,6 +6,7 @@
 #include "GeometryComponent.h"
 #include "MovementComponent.h"
 #include "AnimatedSpriteComponent.h"
+#include "CollisionComponent.h"
 #include "ActorStartMoveEvent.h"
 
 USING_NS_CC;
@@ -60,12 +61,8 @@ bool HelloWorld::init()
 
     /////////////////////////////
     // 3. add your codes below...
-    
-    _hero = new Actor();
-	_hero->addComponent(GeometryComponent::create(Point(200.f, 180.f), Size(40.f, 40.f), 0.f, Point(0.5f, 0.5f))); 
-	_hero->addComponent(MovementComponent::create(Point(0.f, 0.f), Point(0.f, 0.f), Point(20.f, 20.f)));
-    _hero->addComponent(AnimatedSpriteComponent::create(this, "sprites/megaman.pvr", "sprites/megaman.plist", "walk_3.png"));
-    
+	/////////////////////////////
+
 	// decor sprite
 	Sprite* pDecorSprite = Sprite::create("decor.jpg");
 	pDecorSprite->setAnchorPoint(Point(0,1));
@@ -77,6 +74,17 @@ bool HelloWorld::init()
 	pBgSprite->setAnchorPoint(Point(0, 1));
 	pBgSprite->setPosition(Point(0.f, pBgSprite->getContentSize().height));
 	this->addChild(pBgSprite, 0, 1);
+
+	//physic level
+	SynthLevelBitmask* pSLB = new SynthLevelBitmask();
+	pSLB->initWithImageFile("background.png");
+	pSLB->setAbsolutePosition(pBgSprite->getPosition());
+    
+    _hero = new Actor();
+	_hero->addComponent(GeometryComponent::create(Point(200.f, 180.f), Size(74.f, 74.f), 0.f, Point(0.5f, 0.5f)));
+	_hero->addComponent(CollisionComponent::create(pSLB));
+	_hero->addComponent(MovementComponent::create(Point(0.f, 0.f), Point(0.f, 0.f), Point(20.f, 20.f)));
+    _hero->addComponent(AnimatedSpriteComponent::create(this, "sprites/megaman.pvr", "sprites/megaman.plist", "walk_3.png"));
 
 	//set background sprite shaders
 	GLProgram* pBgProgram = new GLProgram();
@@ -91,13 +99,7 @@ bool HelloWorld::init()
     
 	/*//hero
 	_pHero = new SynthHero();
-	_pHero->init(this);
-
-	//physic level
-	SynthLevelBitmask* pSLB = new SynthLevelBitmask();
-	pSLB->initWithImageFile("background.png");
-	pSLB->setAbsolutePosition(pBgSprite->getPosition());
-	_pHero->setLevelBitmask(pSLB);*/
+	_pHero->init(this);*/
 
     return true;
 }

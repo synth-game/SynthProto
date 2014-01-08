@@ -105,7 +105,7 @@ void AnimatedSpriteComponent::onMoveEvent(cocos2d::EventCustom* event) {
 }
 
 void AnimatedSpriteComponent::update(float delta) {
-    //CCLOG("SPRITE UPDATE");
+    CCLOG("SPRITE SIZE : %f, %f", _sprite->getContentSize().width, _sprite->getContentSize().height);
 	_spriteBatch->setPosition(_geometryComponent->_position);
 }
 

@@ -93,6 +93,7 @@ void MovementComponent::update(float fDt) {
 		ActorCollisionEvent* pNeedTestCollisionEvent = new ActorCollisionEvent(static_cast<Actor*>(_owner));
 		pNeedTestCollisionEvent->_currentPosition = pGeometryComponent->_position;
 		pNeedTestCollisionEvent->_targetPosition = nextPosition;
+		pNeedTestCollisionEvent->_size = pGeometryComponent->_size;
 		EventDispatcher::getInstance()->dispatchEvent(pNeedTestCollisionEvent);
 
 		//determine jump end

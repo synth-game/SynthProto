@@ -23,6 +23,6 @@ protected:
 
 	void initListeners();
     void addListeners();
-	cocos2d::EventListenerCustom* _pActorFakeTestCollisionEventListener;
+	cocos2d::EventListenerCustom* _pActorChangePositionListener;
 };
 

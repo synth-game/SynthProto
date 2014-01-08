@@ -6,16 +6,16 @@
 //
 //
 
-#ifndef __ACTOR_COLLISION_EVENT_H__
-#define __ACTOR_COLLISION_EVENT_H__
+#ifndef __ACTOR_CHANGE_POSITION_EVENT_H__
+#define __ACTOR_CHANGE_POSITION_EVENT_H__
 
 #include "cocos2d.h"
 #include "Actor.h"
 
-class ActorCollisionEvent : public cocos2d::EventCustom {
+class ActorChangePositionEvent : public cocos2d::EventCustom {
     
 public:
-    ActorCollisionEvent(Actor* source);
+    ActorChangePositionEvent(Actor* source);
     static const char* eventName;
     inline Actor* getSource() { return _source; }
 	cocos2d::Point _currentPosition;

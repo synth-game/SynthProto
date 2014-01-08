@@ -1,5 +1,5 @@
 #include "GeometryComponent.h"
-#include "ActorCollisionEvent.h"
+#include "ActorChangePositionEvent.h"
 
 USING_NS_CC;
 
@@ -31,22 +31,22 @@ bool GeometryComponent::init() {
 
 void GeometryComponent::initListeners() {
     CCLOG("GeometryComponent init listeners");
-	_pActorFakeTestCollisionEventListener = cocos2d::EventListenerCustom::create(ActorCollisionEvent::eventName, CC_CALLBACK_1(GeometryComponent::onMove, this));
+	_pActorChangePositionListener = cocos2d::EventListenerCustom::create(ActorChangePositionEvent::eventName, CC_CALLBACK_1(GeometryComponent::onMove, this));
 }
 
 void GeometryComponent::addListeners() {
     CCLOG("GeometryComponent add listeners");
     auto dispatcher = cocos2d::EventDispatcher::getInstance();
-    dispatcher->addEventListenerWithFixedPriority(_pActorFakeTestCollisionEventListener, 1);
+    dispatcher->addEventListenerWithFixedPriority(_pActorChangePositionListener, 1);
 }
 
 void GeometryComponent::onMove(EventCustom* event) {
-	ActorCollisionEvent* fakeEvent = static_cast<ActorCollisionEvent*>(event);
-    Actor* eventSource = static_cast<Actor*>(fakeEvent->getSource());
+	ActorChangePositionEvent* changePositionEvent = static_cast<ActorChangePositionEvent*>(event);
+    Actor* eventSource = static_cast<Actor*>(changePositionEvent->getSource());
     Actor* componentOwner = static_cast<Actor*>(_owner);
     if (eventSource->getActorID() == componentOwner->getActorID()) {
 		CCLOG("FAKE EVENT RECEIVED");
-		_position = fakeEvent->_targetPosition;
+		_position = changePositionEvent->_currentPosition;
 	} else {
 		CCLOG("FAKE EVENT RECEIVED BUT ID NOT THE SAME");
 	}

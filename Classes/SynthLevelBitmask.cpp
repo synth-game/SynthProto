@@ -4,28 +4,37 @@
 
 USING_NS_CC;
 
-void SynthLevelBitmask::bitmaskCollisionTest(SynthHero* pHero, Point& nextPosition)
+Point SynthLevelBitmask::bitmaskCollisionTest(Point& currentPosition, Size& size, Point& nextPosition)
 {
-	if(!pHero->isFalling() && !pHero->isJumping() && pHero->isMovingLaterally())
+	if(isOnGround(currentPosition, size))
 	{
-		groundLateralTest(pHero, nextPosition);
+		groundLateralTest(currentPosition, size, nextPosition);
 	}
+	
+	nextPosition = boundingTest(currentPosition, size,  nextPosition, eRight);
+	nextPosition = boundingTest(currentPosition, size,  nextPosition, eLeft);
+	nextPosition = boundingTest(currentPosition, size, nextPosition, eTop);
 
-	if(pHero->getSpeed().y > 0)
-	{
-		boundingTest(pHero, nextPosition, eTop);
-	}
+	return nextPosition;
+}
 
-	if(pHero->getSpeed().x < 0)
-	{
-		boundingTest(pHero, nextPosition, eLeft);
-	}
-	else if(pHero->getSpeed().x > 0)
-	{
-		boundingTest(pHero, nextPosition, eRight);
-	}
+bool SynthLevelBitmask::isOnGround(Point& currentPosition, Size& size) {
 
-	fallTest(pHero, nextPosition);
+		//determine the hero center point on image space
+		int ct_pos_x = static_cast<int>(currentPosition.x - _absolutePosition.x);
+		int ct_pos_y = static_cast<int>(_absolutePosition.y - currentPosition.y);
+
+		//get the bottom point
+		int half_sprite_h = static_cast<int>(floor((size.height/2.f) - 0.5f));
+		int bt_pos_x = ct_pos_x;
+		int bt_pos_y = ct_pos_y +  half_sprite_h;
+
+		//stop the fall
+		bool bGround = false;
+		unsigned char value = getAlpha(bt_pos_x, bt_pos_y);
+		return value == 255;
+		
+		
 }
 
 //Stop the fall on if there is one
@@ -76,14 +85,14 @@ void SynthLevelBitmask::fallTest(SynthHero* pHero, Point& nextPosition)
 
 //move hero sprite when he move lateraly on the ground
 //return the Y position to apply to the sprite
-void SynthLevelBitmask::groundLateralTest(SynthHero* pHero, Point& nextPosition)
+Point SynthLevelBitmask::groundLateralTest(Point& currentPosition, Size& size, Point& nextPosition)
 {
 	//get next available position
 	//determine the hero next bottom point on image space
-	int half_sprite_h = static_cast<int>(floor((pHero->getHeight()/2.f) - 0.5f));
+	int half_sprite_h = static_cast<int>(floor((size.height/2.f) - 0.5f));
 
-	int bt_cur_pos_x = static_cast<int>(pHero->getPosition().x - _absolutePosition.x);
-	int bt_cur_pos_y = static_cast<int>(_absolutePosition.y - pHero->getPosition().y) +  half_sprite_h;
+	int bt_cur_pos_x = static_cast<int>(currentPosition.x - _absolutePosition.x);
+	int bt_cur_pos_y = static_cast<int>(_absolutePosition.y - currentPosition.y) +  half_sprite_h;
 
 	int bt_next_pos_x = static_cast<int>(nextPosition.x - _absolutePosition.x);
 	int bt_next_pos_y = static_cast<int>(_absolutePosition.y - nextPosition.y) +  half_sprite_h;
@@ -118,27 +127,25 @@ void SynthLevelBitmask::groundLateralTest(SynthHero* pHero, Point& nextPosition)
 		int slopeCoef = (bt_next_pos_y - bt_cur_pos_y)/(bt_next_pos_x - bt_cur_pos_x);
 		if(slopeCoef > 3)
 		{
-			nextPosition = pHero->getPosition();
-			pHero->stop();
+			nextPosition = currentPosition;
 		}
 		else if(-3 < slopeCoef && slopeCoef < 3)
 		{
 			nextPosition.y = _absolutePosition.y - (bt_next_pos_y - half_sprite_h);
 		}
-		else
-		{
-			//do nothing
-		}
+		else {/*do nothing*/}
+
+		return nextPosition;
 	}
 }
 
-void SynthLevelBitmask::boundingTest(SynthHero* pHero, Point& nextPosition,  EDirection dir)
+Point SynthLevelBitmask::boundingTest(Point& currentPosition, Size& size, Point& nextPosition,  EDirection dir)
 {
-	int half_sprite_w = static_cast<int>(floor((pHero->getWidth()/2.f) - 0.5f));
-	int half_sprite_h = static_cast<int>(floor((pHero->getHeight()/2.f) - 0.5f));
+	int half_sprite_w = static_cast<int>(floor((size.width/2.f) - 0.5f));
+	int half_sprite_h = static_cast<int>(floor((size.height/2.f) - 0.5f));
 
-	int next_pos_x = static_cast<int>(pHero->getPosition().x - _absolutePosition.x);
-	int	next_pos_y = static_cast<int>(_absolutePosition.y - pHero->getPosition().y);
+	int next_pos_x = static_cast<int>(nextPosition.x - _absolutePosition.x);
+	int	next_pos_y = static_cast<int>(_absolutePosition.y - nextPosition.y);
 	if(dir == eTop)
 	{
 		next_pos_y -= half_sprite_h;
@@ -156,14 +163,16 @@ void SynthLevelBitmask::boundingTest(SynthHero* pHero, Point& nextPosition,  EDi
 	{
 		if(dir == eTop)
 		{
-			pHero->fall();
-			nextPosition.y = pHero->getPosition().y;
+			// fall
+			nextPosition.y = currentPosition.y;
 		}
 		else
 		{
-			pHero->stop();
+			// stop
+			nextPosition.x = currentPosition.x;
 		}
 	}
+	return nextPosition;
 }
 
 unsigned char SynthLevelBitmask::getAlpha(int x, int y)
