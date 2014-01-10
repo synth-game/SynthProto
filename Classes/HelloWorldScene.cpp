@@ -83,7 +83,7 @@ bool HelloWorld::init()
     _hero = new Actor();
 	_hero->addComponent(GeometryComponent::create(Point(200.f, 190.f), Size(74.f, 74.f), 0.f, Point(0.5f, 0.5f)));
 	_hero->addComponent(CollisionComponent::create(pSLB));
-	_hero->addComponent(MovementComponent::create(Point(0.f, 0.f), Point(0.f, 0.f), Point(20.f, 20.f)));
+	_hero->addComponent(MovementComponent::create(Point(0.f, 0.f), Point(0.f, 0.f), Point(5.f, 20.f), Point(0.f, 0.f)));
     _hero->addComponent(AnimatedSpriteComponent::create(this, "sprites/megaman.pvr", "sprites/megaman.plist", "walk_3.png"));
 
 	//set background sprite shaders
@@ -121,17 +121,19 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
     auto dispatcher = EventDispatcher::getInstance();
     switch(keyCode) {
 	case EventKeyboard::KeyCode::KEY_Q:
-		moveEvent->_targetSpeed = Point(-200.f, 0.f);
+		moveEvent->_direction = Point(-1., 0.f);
 		moveEvent->_bChangeX = true;
 		moveEvent->_bChangeY = false;
+		moveEvent->_bStart = true;
         CCLOG("Dispatching ActorStartMoveEvent LEFT");
         dispatcher->dispatchEvent(moveEvent);
 		break;
 
 	case EventKeyboard::KeyCode::KEY_D:
-        moveEvent->_targetSpeed = Point(200.f, 0.f);
+		moveEvent->_direction = Point(1.f, 0.f);
 		moveEvent->_bChangeX = true;
 		moveEvent->_bChangeY = false;
+		moveEvent->_bStart = true;
         CCLOG("Dispatching ActorStartMoveEvent RIGHT");
         dispatcher->dispatchEvent(moveEvent);
 		break;
@@ -153,10 +155,17 @@ void HelloWorld::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
     auto dispatcher = EventDispatcher::getInstance();
     switch(keyCode) {
     case EventKeyboard::KeyCode::KEY_Q:
-	case EventKeyboard::KeyCode::KEY_D:
-		stopMovingEvent->_targetSpeed = Point(0.f, 0.f);
+		stopMovingEvent->_direction = Point(1.f, 0.f);
 		stopMovingEvent->_bChangeX = true;
 		stopMovingEvent->_bChangeY = false;
+		stopMovingEvent->_bStart = false;
+        dispatcher->dispatchEvent(stopMovingEvent);
+		break;
+	case EventKeyboard::KeyCode::KEY_D:
+		stopMovingEvent->_direction = Point(-1.f, 0.f);
+		stopMovingEvent->_bChangeX = true;
+		stopMovingEvent->_bChangeY = false;
+		stopMovingEvent->_bStart = false;
         dispatcher->dispatchEvent(stopMovingEvent);
 		break;
 	default:

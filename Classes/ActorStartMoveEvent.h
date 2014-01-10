@@ -25,9 +25,10 @@ public:
     ActorStartMoveEvent(Actor* source);
     static const char* eventName;
     inline Actor* getSource() { return _source; }
-	cocos2d::Point	_targetSpeed;
+	cocos2d::Point	_direction;
 	bool			_bChangeX;
 	bool			_bChangeY;
+	bool			_bStart;
     
 protected:
     Actor* _source;

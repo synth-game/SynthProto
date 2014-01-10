@@ -86,15 +86,16 @@ void AnimatedSpriteComponent::onMoveEvent(cocos2d::EventCustom* event) {
     Actor* eventSource = static_cast<Actor*>(moveEvent->getSource());
     Actor* componentOwner = static_cast<Actor*>(_owner);
     if (eventSource->getActorID() == componentOwner->getActorID()) {
-		if (moveEvent->_targetSpeed.x < 0) {
-            _sprite->setFlippedX(true);
-            _sprite->runAction(cocos2d::RepeatForever::create( _walkAnimation ));
-        }
-        else if(moveEvent->_targetSpeed.x > 0) {
-            _sprite->setFlippedX(false);
-            _sprite->runAction(cocos2d::RepeatForever::create( _walkAnimation ));
-        }
-		else {
+		if (moveEvent->_bStart) {
+			if (moveEvent->_direction.x < 0) {
+				_sprite->setFlippedX(true);
+				_sprite->runAction(cocos2d::RepeatForever::create( _walkAnimation ));
+			}
+			else if(moveEvent->_direction.x > 0) {
+				_sprite->setFlippedX(false);
+				_sprite->runAction(cocos2d::RepeatForever::create( _walkAnimation ));
+			}
+		} else {
 			_sprite->stopAllActions();
 		}
     }

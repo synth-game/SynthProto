@@ -6,10 +6,10 @@ USING_NS_CC;
 
 Point SynthLevelBitmask::bitmaskCollisionTest(Point& currentPosition, Size& size, Point& nextPosition)
 {
-	if(isOnGround(currentPosition, size))
+	/*if(isOnGround(currentPosition, size))
 	{
 		groundLateralTest(currentPosition, size, nextPosition);
-	}
+	}*/
 	
 	nextPosition = boundingTest(currentPosition, size,  nextPosition, eBottom);
 	nextPosition = boundingTest(currentPosition, size,  nextPosition, eRight);

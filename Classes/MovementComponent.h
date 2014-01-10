@@ -20,14 +20,16 @@ public:
 
 	//Members
 	cocos2d::Point _speed;
-	cocos2d::Point _targetSpeed;
+	cocos2d::Point _direction;
 	cocos2d::Point _acceleration;
+	cocos2d::Point _gravity;
+	bool _bStart;
 	cocos2d::EventListenerCustom* _pChangeMoveEventListener;
 
 	//Methods
 	MovementComponent() : SynthComponent() {}
 	virtual bool init();
-	static MovementComponent* create(cocos2d::Point& speed, cocos2d::Point& targetSpeed, cocos2d::Point& acceleration);
+	static MovementComponent* create(cocos2d::Point& speed, cocos2d::Point& targetSpeed, cocos2d::Point& direction, cocos2d::Point& gravity);
 	
 protected:
     void initListeners();
