@@ -4,21 +4,6 @@
 
 USING_NS_CC;
 
-Point SynthLevelBitmask::bitmaskCollisionTest(Point& currentPosition, Size& size, Point& nextPosition)
-{
-	/*if(isOnGround(currentPosition, size))
-	{
-		groundLateralTest(currentPosition, size, nextPosition);
-	}*/
-	
-	nextPosition = boundingTest(currentPosition, size,  nextPosition, eBottom);
-	nextPosition = boundingTest(currentPosition, size,  nextPosition, eRight);
-	nextPosition = boundingTest(currentPosition, size,  nextPosition, eLeft);
-	nextPosition = boundingTest(currentPosition, size, nextPosition, eTop);
-
-	return nextPosition;
-}
-
 bool SynthLevelBitmask::isOnGround(Point& currentPosition, Size& size) {
 
 		//determine the hero center point on image space
@@ -34,25 +19,6 @@ bool SynthLevelBitmask::isOnGround(Point& currentPosition, Size& size) {
 		bool bGround = false;
 		unsigned char value = getAlpha(bt_pos_x, bt_pos_y);
 		return value == 255;
-		
-		
-}
-
-//Stop the fall on if there is one
-//Start the fall if no ground under the hero
-bool SynthLevelBitmask::fallTest(Point& currentPosition, Size& size) 
-{
-	//determine the hero center point on image space
-	int ct_pos_x = static_cast<int>(currentPosition.x - _absolutePosition.x);
-	int ct_pos_y = static_cast<int>(_absolutePosition.y - currentPosition.y);
-
-	//get the bottom point
-	int half_sprite_h = static_cast<int>(floor((size.height/2.f) - 0.5f));
-	int bt_pos_x = ct_pos_x;
-	int bt_pos_y = ct_pos_y +  half_sprite_h;
-
-	unsigned char value = getAlpha(bt_pos_x, bt_pos_y+1);
-	return value == 0;
 }
 
 //move hero sprite when he move lateraly on the ground
@@ -111,53 +77,53 @@ Point SynthLevelBitmask::groundLateralTest(Point& currentPosition, Size& size, P
 	}
 }
 
-Point SynthLevelBitmask::boundingTest(Point& currentPosition, Size& size, Point& nextPosition,  EDirection dir)
+Point SynthLevelBitmask::boundingTest(Size& size, Point nextPosition,  EDirection dir)
 {
 	int half_sprite_w = static_cast<int>(floor((size.width/2.f) - 0.5f));
 	int half_sprite_h = static_cast<int>(floor((size.height/2.f) - 0.5f));
 
-	int next_pos_x = static_cast<int>(nextPosition.x - _absolutePosition.x);
-	int	next_pos_y = static_cast<int>(_absolutePosition.y - nextPosition.y);
-	if(dir == eTop)
-	{
-		next_pos_y -= half_sprite_h;
-	}
-	if(dir == eBottom)
-	{
-		next_pos_y += half_sprite_h;
-	}
-	else if(dir == eLeft)
-	{
-		next_pos_x -= half_sprite_w;
-	}
-	else if(dir == eRight)
-	{
-		next_pos_x += half_sprite_w;
+	Point imageSpaceNextPos(nextPosition.x - _absolutePosition.x, _absolutePosition.y - nextPosition.y);
+
+	if(dir == eBottom) {
+		imageSpaceNextPos.y += half_sprite_h;
+		imageSpaceNextPos = getNextVoidPixelInDirection(imageSpaceNextPos, Point(0.f, -1.f));
+		nextPosition.y = _absolutePosition.y - imageSpaceNextPos.y + half_sprite_h;
+	} else if (dir == eTop) {
+		imageSpaceNextPos.y -= half_sprite_h;
+		imageSpaceNextPos = getNextVoidPixelInDirection(imageSpaceNextPos, Point(0.f, 1.f));
+		nextPosition.y = _absolutePosition.y - imageSpaceNextPos.y - half_sprite_h;
+	} else if (dir == eLeft) {
+		imageSpaceNextPos.x -= half_sprite_w;
+		imageSpaceNextPos = getNextVoidPixelInDirection(imageSpaceNextPos, Point(1.f, 0.f));
+		nextPosition.x = _absolutePosition.x + imageSpaceNextPos.x + half_sprite_w;
+	} else if(dir == eRight) {
+		imageSpaceNextPos.x += half_sprite_w;
+		imageSpaceNextPos = getNextVoidPixelInDirection(imageSpaceNextPos, Point(-1.f, 0.f));
+		nextPosition.x = _absolutePosition.x + imageSpaceNextPos.x - half_sprite_w;
 	}
 
-	if(getAlpha(next_pos_x, next_pos_y) == 255)
-	{
-		if(dir == eTop || dir == eBottom)
-		{
-			// fall
-			nextPosition.y = currentPosition.y;
-		}
-		else
-		{
-			// stop
-			nextPosition.x = currentPosition.x;
-		}
-	}
 	return nextPosition;
+}
+
+Point SynthLevelBitmask::getNextVoidPixelInDirection(Point currentPixel, Point direction) {
+	Point voidPixel = currentPixel;
+
+	unsigned char ucValue = getAlpha(voidPixel.x, voidPixel.y);
+	while(ucValue != 0) {
+		voidPixel = voidPixel + direction;
+		ucValue =  getAlpha(voidPixel.x, voidPixel.y);
+	}
+
+	return voidPixel;
 }
 
 unsigned char SynthLevelBitmask::getAlpha(int x, int y)
 {
-	if(x >= 0 && x < getWidth() && y >= 0 && y <getHeight())
-	{
-		return getData()[4*(x + y*getWidth()) + 3];
-	}
-	return 255;
+	CCASSERT(x >= 0 , "SynthLevelBitmask : Out of array search for pixel alpha.");
+	CCASSERT(x < getWidth() , "SynthLevelBitmask : Out of array search for pixel alpha.");
+	CCASSERT(y >= 0 , "SynthLevelBitmask : Out of array search for pixel alpha.");
+	CCASSERT(y < getHeight() , "SynthLevelBitmask : Out of array search for pixel alpha.");
+	return getData()[4*(x + y*getWidth()) + 3];
 }
 
 void SynthLevelBitmask::printData()

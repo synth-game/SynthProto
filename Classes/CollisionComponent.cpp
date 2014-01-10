@@ -50,10 +50,26 @@ void CollisionComponent::onTestCollision(EventCustom* event) {
 		//CCLOG("COLLISION EVENT RECEIVED");
 
 		// Interesting content of the method
-		// Slopes
-		Point newPosition = _pBitmask->bitmaskCollisionTest(testCollisionEvent->_currentPosition, testCollisionEvent->_size, testCollisionEvent->_targetPosition);
+		//boundings collision
+		Point bCollisionPosition = _pBitmask->boundingTest(testCollisionEvent->_size, testCollisionEvent->_targetPosition, SynthLevelBitmask::eBottom);
+		Point tCollisionPosition = _pBitmask->boundingTest(testCollisionEvent->_size, testCollisionEvent->_targetPosition, SynthLevelBitmask::eTop);
+		Point lCollisionPosition = _pBitmask->boundingTest(testCollisionEvent->_size, testCollisionEvent->_targetPosition, SynthLevelBitmask::eLeft);
+		Point rCollisionPosition = _pBitmask->boundingTest(testCollisionEvent->_size, testCollisionEvent->_targetPosition, SynthLevelBitmask::eRight);
+		
+		Point newPosition = testCollisionEvent->_targetPosition;
+		if (bCollisionPosition.y != testCollisionEvent->_targetPosition.y) {
+			newPosition.y = bCollisionPosition.y;
+		} else if (tCollisionPosition.y != testCollisionEvent->_targetPosition.y) {
+			newPosition.y = tCollisionPosition.y;
+		}
 
-		if(!newPosition.equals(testCollisionEvent->_currentPosition)) {
+		if (lCollisionPosition.x != testCollisionEvent->_targetPosition.x) {
+			newPosition.x = lCollisionPosition.x;
+		} else if (rCollisionPosition.x != testCollisionEvent->_targetPosition.x) {
+			newPosition.x = rCollisionPosition.x;
+		}
+
+		if (!newPosition.fuzzyEquals(testCollisionEvent->_currentPosition, 1.f)) {
 			ActorChangePositionEvent* pEvent = new ActorChangePositionEvent(static_cast<Actor*>(_owner));
 			pEvent->_currentPosition = newPosition;
 			EventDispatcher::getInstance()->dispatchEvent(pEvent);

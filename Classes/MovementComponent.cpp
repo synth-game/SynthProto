@@ -14,8 +14,8 @@
 #include "ActorJumpEvent.h"
 
 #define MAX_X_SPEED 200.f
-#define MAX_Y_SPEED 300.f
-#define MAX_JUMP_SPEED 500.f
+#define MAX_Y_SPEED 200.f
+#define MAX_JUMP_SPEED 300.f
 #define MIN_JUMP_SPEED 250.f
 
 USING_NS_CC;
@@ -102,14 +102,15 @@ void MovementComponent::update(float fDt) {
 	//compute next speed
 	_speed = _speed + Point(_direction.x*_acceleration.x, _direction.y*_acceleration.y) + _gravity;
 
-	//cap the next speed
+	//cap the next lateral speed
 	if (_bStart) {
 		if(abs(_speed.x) > MAX_X_SPEED) _speed.x = _direction.x * MAX_X_SPEED;
-		if(abs(_speed.y) > MAX_Y_SPEED) _speed.x = _direction.y * MAX_Y_SPEED;
 	} else {
 		if(_speed.x * _direction.x > 0.f) _speed.x = 0.f;
-		//if(_speed.y * _direction.y > 0.f) _speed.y = 0.f;
 	}
+
+	if(_speed.y < -MAX_Y_SPEED ) _speed.y = -MAX_Y_SPEED;
+	if(_speed.y >  MAX_Y_SPEED ) _speed.y =  MAX_Y_SPEED;
 
 	//compute next position
 	GeometryComponent* pGeometryComponent = static_cast<GeometryComponent*>(_owner->getComponent(GeometryComponent::COMPONENT_TYPE));
