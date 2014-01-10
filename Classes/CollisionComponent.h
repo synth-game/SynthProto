@@ -25,6 +25,5 @@ protected:
 	void initListeners();
     void addListeners();
 	virtual void onTestCollision(cocos2d::EventCustom* event);
-	virtual void update(float fDt);
 
 };

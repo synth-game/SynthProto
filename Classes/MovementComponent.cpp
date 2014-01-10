@@ -95,16 +95,5 @@ void MovementComponent::update(float fDt) {
 		pNeedTestCollisionEvent->_targetPosition = nextPosition;
 		pNeedTestCollisionEvent->_size = pGeometryComponent->_size;
 		EventDispatcher::getInstance()->dispatchEvent(pNeedTestCollisionEvent);
-
-		//determine jump end
-		if(_targetSpeed.y == _speed.y && _targetSpeed.y > 0)
-		{
-			ActorStartMoveEvent* pFallEvent = new ActorStartMoveEvent(static_cast<Actor*>(_owner));
-			pFallEvent->_targetSpeed = Point(0, -300.f);
-			pFallEvent->_bChangeX = false;
-			pFallEvent->_bChangeY = true;
-
-			EventDispatcher::getInstance()->dispatchEvent(pFallEvent);
-		}
 	}
 }
