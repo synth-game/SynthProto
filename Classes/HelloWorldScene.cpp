@@ -8,6 +8,7 @@
 #include "AnimatedSpriteComponent.h"
 #include "CollisionComponent.h"
 #include "ActorStartMoveEvent.h"
+#include "ActorJumpEvent.h"
 
 USING_NS_CC;
 
@@ -83,7 +84,7 @@ bool HelloWorld::init()
     _hero = new Actor();
 	_hero->addComponent(GeometryComponent::create(Point(200.f, 190.f), Size(74.f, 74.f), 0.f, Point(0.5f, 0.5f)));
 	_hero->addComponent(CollisionComponent::create(pSLB));
-	_hero->addComponent(MovementComponent::create(Point(0.f, 0.f), Point(0.f, 0.f), Point(5.f, 20.f), Point(0.f, -10.f)));
+	_hero->addComponent(MovementComponent::create(Point(0.f, 0.f), Point(0.f, 0.f), Point(20.f, 20.f), Point(0.f, -10.f)));
     _hero->addComponent(AnimatedSpriteComponent::create(this, "sprites/megaman.pvr", "sprites/megaman.plist", "walk_3.png"));
 
 	//set background sprite shaders
@@ -117,10 +118,12 @@ void HelloWorld::menuCloseCallback(Object* pSender)
 void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 {
 	CCLOG("KEY PRESSED");
-	ActorStartMoveEvent* moveEvent = new ActorStartMoveEvent(_hero);
+	ActorStartMoveEvent* moveEvent = nullptr;
+	ActorJumpEvent* jumpEvent = nullptr;
     auto dispatcher = EventDispatcher::getInstance();
     switch(keyCode) {
 	case EventKeyboard::KeyCode::KEY_Q:
+		moveEvent = new ActorStartMoveEvent(_hero);
 		moveEvent->_direction = Point(-1., 0.f);
 		moveEvent->_bChangeX = true;
 		moveEvent->_bChangeY = false;
@@ -130,6 +133,7 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 		break;
 
 	case EventKeyboard::KeyCode::KEY_D:
+		moveEvent = new ActorStartMoveEvent(_hero);
 		moveEvent->_direction = Point(1.f, 0.f);
 		moveEvent->_bChangeX = true;
 		moveEvent->_bChangeY = false;
@@ -139,8 +143,10 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 		break;
 
 	case EventKeyboard::KeyCode::KEY_SPACE:
-		
+		jumpEvent = new ActorJumpEvent(_hero);
+		jumpEvent->_bStart = true;
 		CCLOG("Dispatching ActorStartMoveEvent JUMP");
+		dispatcher->dispatchEvent(jumpEvent);
 		break;
 
 	default:
@@ -151,10 +157,12 @@ void HelloWorld::onKeyPressed(EventKeyboard::KeyCode keyCode, Event *event)
 void HelloWorld::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event *event)
 {
     CCLOG("KEY RELEASED");
-    ActorStartMoveEvent* stopMovingEvent = new ActorStartMoveEvent(_hero);
     auto dispatcher = EventDispatcher::getInstance();
+	ActorStartMoveEvent* stopMovingEvent = nullptr;
+	ActorJumpEvent* jumpEvent = nullptr;
     switch(keyCode) {
     case EventKeyboard::KeyCode::KEY_Q:
+		stopMovingEvent = new ActorStartMoveEvent(_hero);
 		stopMovingEvent->_direction = Point(1.f, 0.f);
 		stopMovingEvent->_bChangeX = true;
 		stopMovingEvent->_bChangeY = false;
@@ -162,11 +170,17 @@ void HelloWorld::onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d:
         dispatcher->dispatchEvent(stopMovingEvent);
 		break;
 	case EventKeyboard::KeyCode::KEY_D:
+		stopMovingEvent = new ActorStartMoveEvent(_hero);
 		stopMovingEvent->_direction = Point(-1.f, 0.f);
 		stopMovingEvent->_bChangeX = true;
 		stopMovingEvent->_bChangeY = false;
 		stopMovingEvent->_bStart = false;
         dispatcher->dispatchEvent(stopMovingEvent);
+		break;
+	case EventKeyboard::KeyCode::KEY_SPACE:
+		jumpEvent = new ActorJumpEvent(_hero);
+		jumpEvent->_bStart = false;
+		dispatcher->dispatchEvent(jumpEvent);
 		break;
 	default:
 		break;

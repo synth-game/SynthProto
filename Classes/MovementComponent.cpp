@@ -11,9 +11,12 @@
 #include "GeometryComponent.h"
 #include "ActorStartMoveEvent.h"
 #include "ActorCollisionEvent.h"
+#include "ActorJumpEvent.h"
 
 #define MAX_X_SPEED 200.f
 #define MAX_Y_SPEED 300.f
+#define MAX_JUMP_SPEED 500.f
+#define MIN_JUMP_SPEED 250.f
 
 USING_NS_CC;
 
@@ -47,13 +50,15 @@ MovementComponent* MovementComponent::create(Point& speed, Point& direction, Poi
 
 void MovementComponent::initListeners() {
     CCLOG("MovementComponent init listeners");
-	_pChangeMoveEventListener = cocos2d::EventListenerCustom::create(ActorStartMoveEvent::eventName, CC_CALLBACK_1(MovementComponent::onChangeMove, this));
+	_pChangeMoveEventListener = EventListenerCustom::create(ActorStartMoveEvent::eventName, CC_CALLBACK_1(MovementComponent::onChangeMove, this));
+	_pJumpEventListener = EventListenerCustom::create(ActorJumpEvent::eventName, CC_CALLBACK_1(MovementComponent::onJump, this));
 }
 
 void MovementComponent::addListeners() {
     CCLOG("MovementComponenet add listeners");
-    auto dispatcher = cocos2d::EventDispatcher::getInstance();
+    auto dispatcher = EventDispatcher::getInstance();
     dispatcher->addEventListenerWithFixedPriority(_pChangeMoveEventListener, 1);
+	dispatcher->addEventListenerWithFixedPriority(_pJumpEventListener, 1);
 }
 
 void MovementComponent::onChangeMove(cocos2d::EventCustom* event) {
@@ -78,6 +83,21 @@ void MovementComponent::onChangeMove(cocos2d::EventCustom* event) {
     
 }
 
+void MovementComponent::onJump(cocos2d::EventCustom* event) {
+	ActorJumpEvent* jumpEvent = static_cast<ActorJumpEvent*>(event);
+    Actor* eventSource = static_cast<Actor*>(jumpEvent->getSource());
+    Actor* componentOwner = static_cast<Actor*>(_owner);
+    if (eventSource->getActorID() == componentOwner->getActorID()) {
+		if (jumpEvent->_bStart) {
+			_speed.y = MAX_JUMP_SPEED;
+		} else {
+			if(_speed.y > MIN_JUMP_SPEED) {
+				_speed.y = MIN_JUMP_SPEED;
+			}
+		}
+	}
+}
+
 void MovementComponent::update(float fDt) {
 	//compute next speed
 	_speed = _speed + Point(_direction.x*_acceleration.x, _direction.y*_acceleration.y) + _gravity;
@@ -88,9 +108,8 @@ void MovementComponent::update(float fDt) {
 		if(abs(_speed.y) > MAX_Y_SPEED) _speed.x = _direction.y * MAX_Y_SPEED;
 	} else {
 		if(_speed.x * _direction.x > 0.f) _speed.x = 0.f;
-		if(_speed.y * _direction.y > 0.f) _speed.y = 0.f;
+		//if(_speed.y * _direction.y > 0.f) _speed.y = 0.f;
 	}
-	
 
 	//compute next position
 	GeometryComponent* pGeometryComponent = static_cast<GeometryComponent*>(_owner->getComponent(GeometryComponent::COMPONENT_TYPE));

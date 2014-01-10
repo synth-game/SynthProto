@@ -47,7 +47,7 @@ void CollisionComponent::onTestCollision(EventCustom* event) {
     Actor* eventSource = static_cast<Actor*>(testCollisionEvent->getSource());
     Actor* componentOwner = static_cast<Actor*>(_owner);
     if (eventSource->getActorID() == componentOwner->getActorID()) {
-		CCLOG("COLLISION EVENT RECEIVED");
+		//CCLOG("COLLISION EVENT RECEIVED");
 
 		// Interesting content of the method
 		// Slopes

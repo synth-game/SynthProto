@@ -25,16 +25,18 @@ public:
 	cocos2d::Point _gravity;
 	bool _bStart;
 	cocos2d::EventListenerCustom* _pChangeMoveEventListener;
+	cocos2d::EventListenerCustom* _pJumpEventListener;
 
 	//Methods
 	MovementComponent() : SynthComponent() {}
 	virtual bool init();
-	static MovementComponent* create(cocos2d::Point& speed, cocos2d::Point& targetSpeed, cocos2d::Point& direction, cocos2d::Point& gravity);
+	static MovementComponent* create(cocos2d::Point& speed, cocos2d::Point& direction, cocos2d::Point& acceleration, cocos2d::Point& gravity);
 	
 protected:
     void initListeners();
     void addListeners();
     void onChangeMove(cocos2d::EventCustom* event);
+	void onJump(cocos2d::EventCustom* event);
 	virtual void update(float fDt);
 
 	inline float sign(float f) { if(f>0) {return 1.f;} else {return -1.f;} }
