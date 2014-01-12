@@ -102,6 +102,9 @@ Point SynthLevelBitmask::boundingTest(Size& size, Point nextPosition,  EDirectio
 		nextPosition.x = _absolutePosition.x + imageSpaceNextPos.x - half_sprite_w;
 	}
 
+	nextPosition.x = floor(nextPosition.x);
+	nextPosition.y = floor(nextPosition.y);
+
 	return nextPosition;
 }
 

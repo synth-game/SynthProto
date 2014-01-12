@@ -26,6 +26,7 @@ public:
 	bool _bStart;
 	cocos2d::EventListenerCustom* _pChangeMoveEventListener;
 	cocos2d::EventListenerCustom* _pJumpEventListener;
+	cocos2d::EventListenerCustom* _pStopMoveEventListener;
 
 	//Methods
 	MovementComponent() : SynthComponent() {}
@@ -37,6 +38,7 @@ protected:
     void addListeners();
     void onChangeMove(cocos2d::EventCustom* event);
 	void onJump(cocos2d::EventCustom* event);
+	void onStopMove(cocos2d::EventCustom* event);
 	virtual void update(float fDt);
 
 	inline float sign(float f) { if(f>0) {return 1.f;} else {return -1.f;} }

@@ -12,11 +12,12 @@
 #include "ActorStartMoveEvent.h"
 #include "ActorCollisionEvent.h"
 #include "ActorJumpEvent.h"
+#include "ActorStopMoveEvent.h"
 
 #define MAX_X_SPEED 200.f
-#define MAX_Y_SPEED 200.f
+#define MAX_Y_SPEED 300.f
 #define MAX_JUMP_SPEED 300.f
-#define MIN_JUMP_SPEED 250.f
+#define MIN_JUMP_SPEED 150.f
 
 USING_NS_CC;
 
@@ -52,6 +53,7 @@ void MovementComponent::initListeners() {
     CCLOG("MovementComponent init listeners");
 	_pChangeMoveEventListener = EventListenerCustom::create(ActorStartMoveEvent::eventName, CC_CALLBACK_1(MovementComponent::onChangeMove, this));
 	_pJumpEventListener = EventListenerCustom::create(ActorJumpEvent::eventName, CC_CALLBACK_1(MovementComponent::onJump, this));
+	_pStopMoveEventListener = EventListenerCustom::create(ActorStopMoveEvent::eventName, CC_CALLBACK_1(MovementComponent::onStopMove, this));
 }
 
 void MovementComponent::addListeners() {
@@ -59,6 +61,7 @@ void MovementComponent::addListeners() {
     auto dispatcher = EventDispatcher::getInstance();
     dispatcher->addEventListenerWithFixedPriority(_pChangeMoveEventListener, 1);
 	dispatcher->addEventListenerWithFixedPriority(_pJumpEventListener, 1);
+	dispatcher->addEventListenerWithFixedPriority(_pStopMoveEventListener, 1);
 }
 
 void MovementComponent::onChangeMove(cocos2d::EventCustom* event) {
@@ -98,6 +101,21 @@ void MovementComponent::onJump(cocos2d::EventCustom* event) {
 	}
 }
 
+void MovementComponent::onStopMove(cocos2d::EventCustom* event) {
+	ActorStopMoveEvent* stopMoveEvent = static_cast<ActorStopMoveEvent*>(event);
+	Actor* eventSource = static_cast<Actor*>(stopMoveEvent->getSource());
+	Actor* componentOwner = static_cast<Actor*>(_owner);
+	if(eventSource->getActorID() == componentOwner->getActorID()) {
+		if (stopMoveEvent->_bHorizontalStop) {
+			_speed.x = 0.f;
+		}
+
+		if (stopMoveEvent->_bVerticalStop) {
+			_speed.y = 0.f;
+		}
+	}
+}
+
 void MovementComponent::update(float fDt) {
 	//compute next speed
 	_speed = _speed + Point(_direction.x*_acceleration.x, _direction.y*_acceleration.y) + _gravity;
@@ -117,6 +135,8 @@ void MovementComponent::update(float fDt) {
 	CCASSERT(pGeometryComponent != NULL, "MovementComponent need a GeometryComponent added to its owner");
 
 	Point nextPosition = pGeometryComponent->_position + (_speed * fDt);
+	nextPosition.x = floor(nextPosition.x);
+	nextPosition.y = floor(nextPosition.y);
 
 	//send event for collision
 	ActorCollisionEvent* pNeedTestCollisionEvent = new ActorCollisionEvent(static_cast<Actor*>(_owner));

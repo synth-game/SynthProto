@@ -4,6 +4,7 @@
 #include "ActorCollisionEvent.h"
 #include "ActorStartMoveEvent.h"
 #include "ActorChangePositionEvent.h"
+#include "ActorStopMoveEvent.h"
 
 USING_NS_CC;
 
@@ -57,10 +58,13 @@ void CollisionComponent::onTestCollision(EventCustom* event) {
 		Point rCollisionPosition = _pBitmask->boundingTest(testCollisionEvent->_size, testCollisionEvent->_targetPosition, SynthLevelBitmask::eRight);
 		
 		Point newPosition = testCollisionEvent->_targetPosition;
+		bool bVerticalCollision = false;
 		if (bCollisionPosition.y != testCollisionEvent->_targetPosition.y) {
 			newPosition.y = bCollisionPosition.y;
+			bVerticalCollision = true;
 		} else if (tCollisionPosition.y != testCollisionEvent->_targetPosition.y) {
 			newPosition.y = tCollisionPosition.y;
+			bVerticalCollision = true;
 		}
 
 		if (lCollisionPosition.x != testCollisionEvent->_targetPosition.x) {
@@ -69,10 +73,17 @@ void CollisionComponent::onTestCollision(EventCustom* event) {
 			newPosition.x = rCollisionPosition.x;
 		}
 
-		if (!newPosition.fuzzyEquals(testCollisionEvent->_currentPosition, 1.f)) {
-			ActorChangePositionEvent* pEvent = new ActorChangePositionEvent(static_cast<Actor*>(_owner));
-			pEvent->_currentPosition = newPosition;
-			EventDispatcher::getInstance()->dispatchEvent(pEvent);
+		if (!newPosition.equals(testCollisionEvent->_currentPosition)) {
+			ActorChangePositionEvent* pChangePositionEvent = new ActorChangePositionEvent(static_cast<Actor*>(_owner));
+			pChangePositionEvent->_currentPosition = newPosition;
+			EventDispatcher::getInstance()->dispatchEvent(pChangePositionEvent);
+		}
+
+		if (bVerticalCollision) {
+			ActorStopMoveEvent* pStopEvent = new ActorStopMoveEvent(static_cast<Actor*>(_owner));
+			pStopEvent->_bHorizontalStop = false;
+			pStopEvent->_bVerticalStop = true;
+			EventDispatcher::getInstance()->dispatchEvent(pStopEvent);
 		}
 
 	} else {
