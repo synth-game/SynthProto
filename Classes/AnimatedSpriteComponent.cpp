@@ -9,6 +9,7 @@
 #include "cocos2d.h"
 #include "AnimatedSpriteComponent.h"
 #include "ActorStartMoveEvent.h"
+#include "ActorChangePositionEvent.h"
 #include "GeometryComponent.h"
 
 const char* AnimatedSpriteComponent::componentName = "AnimatedSpriteComponent";
@@ -38,13 +39,13 @@ bool AnimatedSpriteComponent::init() {
 	_frameCache = cocos2d::SpriteFrameCache::sharedSpriteFrameCache();
 	_frameCache->addSpriteFramesWithFile("sprites/megaman.plist");
 	_frameCache->retain();
-    
+
 	_sprite = cocos2d::Sprite::createWithSpriteFrameName("walk_3.png");
 	_spriteBatch->addChild(_sprite);
 	_spriteBatch->setPosition(cocos2d::Point(0.f, 0.f));
 
 	_parent->addChild(_spriteBatch, 1);
-    
+
     // Sprite animation
     _animFrames = cocos2d::Array::create();
 	char str[100] = {0};
@@ -57,28 +58,30 @@ bool AnimatedSpriteComponent::init() {
 	}
 	_walkAnimation = cocos2d::Animate::create(cocos2d::Animation::createWithSpriteFrames(_animFrames, 0.1f));
     _walkAnimation->retain();
-    
+
     initListeners();
     addListeners();
-    
+
     return true;
 }
 
 void AnimatedSpriteComponent::onEnter() { //Appelée après l'ajout dans le componentContainer par la classe Node (avant le owner n'est pas défini)
-	_geometryComponent = static_cast<GeometryComponent*>(_owner->getComponent(GeometryComponent::COMPONENT_TYPE));
-    CCASSERT(_geometryComponent != NULL, "SpriteComponent need a GeometryComponent added to its owner"); //Ici ça sous-entend qu'on ne peut pas créer de sprite qui n'ait pas besoin de bouger, ce qui est donc injuste. D'où la nécessité de passer plutôt par un PositionComponent par la suite qui se charge simplement de la position de l'objet.
-	_spriteBatch->setPosition(_geometryComponent->_position);
+	GeometryComponent* geometryComponent = static_cast<GeometryComponent*>(_owner->getComponent(GeometryComponent::COMPONENT_TYPE));
+    CCASSERT(geometryComponent != NULL, "SpriteComponent need a GeometryComponent added to its owner"); //Ici ça sous-entend qu'on ne peut pas créer de sprite qui n'ait pas besoin de bouger, ce qui est donc injuste. D'où la nécessité de passer plutôt par un PositionComponent par la suite qui se charge simplement de la position de l'objet.
+	_spriteBatch->setPosition(geometryComponent->_position);
 }
 
 void AnimatedSpriteComponent::initListeners() {
     CCLOG("SpriteComponent init listeners");
-	_actorMoveEventListener = cocos2d::EventListenerCustom::create(ActorStartMoveEvent::eventName, CC_CALLBACK_1(AnimatedSpriteComponent::onMoveEvent, this));    
+	_actorMoveEventListener = cocos2d::EventListenerCustom::create(ActorStartMoveEvent::eventName, CC_CALLBACK_1(AnimatedSpriteComponent::onMoveEvent, this));
+    _pActorChangePositionListener = cocos2d::EventListenerCustom::create(ActorChangePositionEvent::eventName, CC_CALLBACK_1(AnimatedSpriteComponent::onChangePosition, this));
 }
 
 void AnimatedSpriteComponent::addListeners() {
     CCLOG("SpriteComponent add listeners");
     auto dispatcher = cocos2d::EventDispatcher::getInstance();
     dispatcher->addEventListenerWithFixedPriority(_actorMoveEventListener, 1);
+    dispatcher->addEventListenerWithFixedPriority(_pActorChangePositionListener, 1);
 }
 
 void AnimatedSpriteComponent::onMoveEvent(cocos2d::EventCustom* event) {
@@ -102,12 +105,24 @@ void AnimatedSpriteComponent::onMoveEvent(cocos2d::EventCustom* event) {
     else {
         CCLOG("MOVE EVENT RECEIVED BUT ID NOT THE SAME");
     }
-    
+
+}
+
+void AnimatedSpriteComponent::onChangePosition(cocos2d::EventCustom* event) {
+    ActorChangePositionEvent* changePositionEvent = static_cast<ActorChangePositionEvent*>(event);
+    Actor* eventSource = static_cast<Actor*>(changePositionEvent->getSource());
+    Actor* componentOwner = static_cast<Actor*>(_owner);
+    if (eventSource->getActorID() == componentOwner->getActorID()) {
+        CCLOG("FAKE EVENT RECEIVED");
+        _spriteBatch->setPosition(changePositionEvent->_currentPosition);
+    } else {
+        CCLOG("FAKE EVENT RECEIVED BUT ID NOT THE SAME");
+    }
 }
 
 void AnimatedSpriteComponent::update(float delta) {
     //CCLOG("SPRITE SIZE : %f, %f", _sprite->getContentSize().width, _sprite->getContentSize().height);
-	_spriteBatch->setPosition(_geometryComponent->_position);
+	//_spriteBatch->setPosition(_geometryComponent->_position);
 }
 
 

@@ -14,18 +14,12 @@ USING_NS_CC;
 
 HelloWorld::HelloWorld()
 	: LayerColor()
-	, _pHero(NULL)
 {
 
 }
 
 HelloWorld::~HelloWorld()
 {
-	if(_pHero)
-	{
-		delete _pHero;
-		_pHero = NULL;
-	}
 }
 
 Scene* HelloWorld::createScene()

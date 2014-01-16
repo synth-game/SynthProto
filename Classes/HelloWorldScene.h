@@ -2,8 +2,6 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
-#include "SynthHero.h"
-#include "EventTypes.h"
 #include "Actor.h"
 
 class HelloWorld : public cocos2d::LayerColor
@@ -32,7 +30,6 @@ public:
     CREATE_FUNC(HelloWorld);
 
 private:
-	SynthHero* _pHero;
     Actor* _hero;
     Actor* _hero2;
     

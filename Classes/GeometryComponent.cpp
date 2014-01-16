@@ -5,7 +5,7 @@ USING_NS_CC;
 
 const char* GeometryComponent::COMPONENT_TYPE = "GeometryComponent";
 
-GeometryComponent* GeometryComponent::create(cocos2d::Point& position, cocos2d::Size& size, float rotationAngle, cocos2d::Point& anchorPoint) {
+GeometryComponent* GeometryComponent::create(cocos2d::Point position, cocos2d::Size size, float rotationAngle, cocos2d::Point anchorPoint) {
 	 GeometryComponent* pRet = new GeometryComponent();
     if (pRet != NULL && pRet->init())
     {

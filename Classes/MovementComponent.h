@@ -31,7 +31,7 @@ public:
 	//Methods
 	MovementComponent() : SynthComponent() {}
 	virtual bool init();
-	static MovementComponent* create(cocos2d::Point& speed, cocos2d::Point& direction, cocos2d::Point& acceleration, cocos2d::Point& gravity);
+	static MovementComponent* create(cocos2d::Point speed, cocos2d::Point direction, cocos2d::Point acceleration, cocos2d::Point gravity);
 	
 protected:
     void initListeners();

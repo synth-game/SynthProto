@@ -1,7 +1,5 @@
 #include "SynthLevelBitmask.h"
 
-#include "SynthHero.h"
-
 USING_NS_CC;
 
 bool SynthLevelBitmask::isOnGround(Point& currentPosition, Size& size) {

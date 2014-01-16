@@ -16,7 +16,7 @@ public:
 	GeometryComponent() : SynthComponent() {};
 
 	virtual bool init();
-	static GeometryComponent* create(cocos2d::Point& position, cocos2d::Size& size, float rotationAngle, cocos2d::Point& anchorPoint);
+	static GeometryComponent* create(cocos2d::Point position, cocos2d::Size size, float rotationAngle, cocos2d::Point anchorPoint);
 
 protected:
 	void onMove(cocos2d::EventCustom* event);

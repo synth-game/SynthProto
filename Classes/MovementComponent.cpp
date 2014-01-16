@@ -29,7 +29,7 @@ bool MovementComponent::init() {
 	return true;
 }
 
-MovementComponent* MovementComponent::create(Point& speed, Point& direction, Point& acceleration, cocos2d::Point& gravity) {
+MovementComponent* MovementComponent::create(Point speed, Point direction, Point acceleration, cocos2d::Point gravity) {
     MovementComponent* pRet = new MovementComponent();
     if (pRet != NULL && pRet->init())
     {
