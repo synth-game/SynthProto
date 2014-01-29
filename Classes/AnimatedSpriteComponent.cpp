@@ -35,12 +35,12 @@ AnimatedSpriteComponent* AnimatedSpriteComponent::create(cocos2d::Layer* parent,
 bool AnimatedSpriteComponent::init() {
     // Sprite sheet
     setName(componentName);
-	_spriteBatch = cocos2d::SpriteBatchNode::create("sprites/megaman.pvr");
+	_spriteBatch = cocos2d::SpriteBatchNode::create("sprites/girl.pvr");
 	_frameCache = cocos2d::SpriteFrameCache::sharedSpriteFrameCache();
-	_frameCache->addSpriteFramesWithFile("sprites/megaman.plist");
+	_frameCache->addSpriteFramesWithFile("sprites/girl.plist");
 	_frameCache->retain();
 
-	_sprite = cocos2d::Sprite::createWithSpriteFrameName("walk_3.png");
+	_sprite = cocos2d::Sprite::createWithSpriteFrameName("walk_0.png");
 	_spriteBatch->addChild(_sprite);
 	_spriteBatch->setPosition(cocos2d::Point(0.f, 0.f));
 
